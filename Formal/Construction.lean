@@ -30,7 +30,7 @@ lemma bind₁_eq_sum (h : σ → MvPolynomial τ ℝ) (p : MvPolynomial σ ℝ) 
 lemma LowDeg.pow {a : ℕ} {p : MvPolynomial σ ℝ} (hp : LowDeg a p) (m : ℕ) :
     LowDeg (m * a) (p ^ m) := by
   induction m with
-  | zero => simpa using lowDeg_zero (p ^ 0)
+  | zero => simp
   | succ k ih =>
       rw [pow_succ, Nat.succ_mul]
       exact ih.mul hp
@@ -120,8 +120,8 @@ theorem lowDeg_iter_sub_lin {A : Matrix (Fin n) (Fin n) ℝ}
       have hone : ∑ k, C ((1 : Matrix (Fin n) (Fin n) ℝ) i k) * X k
           = (X i : MvPolynomial (Fin n) ℝ) := by
         rw [Finset.sum_eq_single i]
-        · simp [Matrix.one_apply]
-        · intro b _ hb; simp [Matrix.one_apply, Ne.symm hb]
+        · simp []
+        · intro b _ hb; simp [Ne.symm hb]
         · intro h; simp at h
       rw [hone, sub_self]
       exact lowDeg_of_zero 2

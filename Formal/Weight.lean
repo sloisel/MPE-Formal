@@ -204,7 +204,7 @@ lemma sum_le_dyadicConst {n p : ℕ} (hn : 0 < n) (s : Finset ℕ) :
   (summable_dyadic n p hn).sum_le_tsum s (fun j _ => by positivity)
 
 /-- The dyadic sum, as a `tsum`. -/
-lemma tsum_dyadic {n p : ℕ} (hn : 0 < n) :
+lemma tsum_dyadic {n p : ℕ} (_hn : 0 < n) :
     ∑' j : ℕ, ((1:ℝ)/2) ^ (n * j) * (1 + j) ^ p = dyadicConst n p := rfl
 
 /-- The two dyadic series that occur in the shell sum, added. -/
@@ -237,7 +237,7 @@ lemma log_le_rpow_div {y : ℝ} (hy : 0 < y) {ε : ℝ} (hε : 0 < ε) :
 
 /-- **The logarithm is absorbed by any positive power.**  For `0 < p < 1` there is `C > 0`
 with `x · Λ(x)^k ≤ C · x^p` for all `x ∈ (0,1]`. -/
-theorem exists_mul_Lam_pow_le_rpow (k : ℕ) {p : ℝ} (hp0 : 0 < p) (hp1 : p < 1) :
+theorem exists_mul_Lam_pow_le_rpow (k : ℕ) {p : ℝ} (_hp0 : 0 < p) (hp1 : p < 1) :
     ∃ C : ℝ, 0 < C ∧ ∀ x : ℝ, 0 < x → x ≤ 1 → x * Lam x ^ k ≤ C * x ^ p := by
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · -- no logarithm at all: `x = x^1 ≤ x^p` since `x ≤ 1` and `p < 1`

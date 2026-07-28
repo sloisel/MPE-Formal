@@ -62,12 +62,12 @@ the margin drops below `s'` with probability at most `A (s' + δ')^(1/dQ)`.  Eve
 is the machinery already built for Theorem 4.9. -/
 theorem theorem47_of_anticonc (C : CycleData (Fin (M + 2) → ℝ)) {ρ : ℝ}
     (hSmeas : Measurable C.S) (hτmeas : Measurable C.τ)
-    {dQ : ℕ} (hdQ : 0 < dQ) {A : ℝ} (hA0 : 0 ≤ A)
+    {dQ : ℕ} (_hdQ : 0 < dQ) {A : ℝ} (_hA0 : 0 ≤ A)
     (hCA : ∀ δ' s' : ℝ, 0 < δ' → 2 * δ' ≤ ρ → 0 < s' → s' ≤ 1 →
       ∀ x : Fin (M + 2) → ℝ, ‖x‖ ≤ δ' →
         blockMeasure (M + 2) {b | C.τ (x + δ' • clamp b) < s'}
           ≤ ENNReal.ofReal (A * (s' + δ') ^ ((dQ : ℝ)⁻¹)))
-    {θ : ℝ} (hθ1 : 1 < θ) (hθ2 : θ < 2) :
+    {θ : ℝ} (hθ1 : 1 < θ) (_hθ2 : θ < 2) :
     ∀ δ : ℝ, 0 < δ → δ ≤ 1 → 2 * δ ≤ ρ → 2 * δ ≤ C.ρ₁ →
       (∀ m, hSched C.M δ θ m ≤ 1) →
       ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →

@@ -73,7 +73,7 @@ theorem exists_ann_eq_minpoly (A : Matrix (Fin n) (Fin n) ℝ) :
   have hmp0 : mp ≠ 0 := minpoly.ne_zero hint
   have hmpaev : (aeval A) mp = 0 := minpoly.aeval ℝ A
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- the finitely many irreducible factors of `m_A`, and a chosen cofactor for each
   set S : Finset ℝ[X] := (UniqueFactorizationMonoid.normalizedFactors mp).toFinset with hSdef
   set cof : ℝ[X] → ℝ[X] := fun q => if h : q ∣ mp then h.choose else 0 with hcofdef

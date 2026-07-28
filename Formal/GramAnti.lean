@@ -125,7 +125,7 @@ theorem gram_prob {A : Matrix (Fin (M + 2)) (Fin (M + 2)) ℝ} (hk : 0 < k)
     _ ≤ ENNReal.ofReal (δ'⁻¹ ^ (M + 2)) *
           (ENNReal.ofReal ((2 * (2 * δ' * (1 + ‖v‖))) ^ (M + 1)) *
             ENNReal.ofReal (4 * ((2 * k : ℕ) : ℝ) * (ε / |c|) ^ p)) :=
-        mul_le_mul_left' hvolT _
+        mul_le_mul_right hvolT _
     _ = ENNReal.ofReal (Cst * ε ^ p / δ') := by
         rw [← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity),
           harith]

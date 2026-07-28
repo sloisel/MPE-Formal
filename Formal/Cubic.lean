@@ -155,9 +155,9 @@ theorem nonempty_smoothData3 [FiniteDimensional ℝ G] {f : G → G} {R₀ : ℝ
     have hsm := hΦ.const_smul (1/2 : ℝ)
     have heq : (1/2 : ℝ) • ((B x).comp (ContinuousLinearMap.id ℝ G) + B.flip x) = B x := by
       ext v
-      simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.add_apply,
-        ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.id_apply,
-        ContinuousLinearMap.flip_apply, smul_eq_mul]
+      simp only [smul_apply, add_apply,
+        ContinuousLinearMap.coe_comp, Function.comp_apply, ContinuousLinearMap.id_apply,
+        ContinuousLinearMap.flip_apply]
       have := hsymm v x
       rw [← hBdef] at this
       rw [this]
@@ -193,7 +193,7 @@ theorem nonempty_smoothData3 [FiniteDimensional ℝ G] {f : G → G} {R₀ : ℝ
            hq₂smul := by
              intro t x
              rw [hq₂def]
-             simp only [map_smul, ContinuousLinearMap.smul_apply, smul_smul]
+             simp only [map_smul, smul_apply, smul_smul]
              congr 1
              ring
            hq₂lip := by
@@ -201,7 +201,7 @@ theorem nonempty_smoothData3 [FiniteDimensional ℝ G] {f : G → G} {R₀ : ℝ
              rw [hq₂def]
              have hsplit : (B a) a - (B b) b = (B a) (a - b) + (B (a - b)) b := by
                rw [map_sub, map_sub]
-               simp only [ContinuousLinearMap.sub_apply]
+               simp only [sub_apply]
                abel
              rw [← smul_sub, norm_smul, Real.norm_eq_abs, hsplit]
              have h1 : ‖(B a) (a - b)‖ ≤ ‖B‖ * ‖a‖ * ‖a - b‖ :=

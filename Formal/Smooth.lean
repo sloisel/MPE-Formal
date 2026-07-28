@@ -79,8 +79,8 @@ The constants above come from compactness: a `Cᵏ` map has bounded iterated der
 closed unit ball. -/
 
 theorem exists_fderiv_bound_of_contDiffOn {g : E → F} [FiniteDimensional ℝ E] {R : ℝ}
-    (hR : 0 ≤ R) (hg : ContDiffOn ℝ 1 g (closedBall (0 : E) R))
-    (hopen : ∀ z ∈ closedBall (0 : E) R, DifferentiableAt ℝ g z)
+    (_hR : 0 ≤ R) (_hg : ContDiffOn ℝ 1 g (closedBall (0 : E) R))
+    (_hopen : ∀ z ∈ closedBall (0 : E) R, DifferentiableAt ℝ g z)
     (hcont : ContinuousOn (fun z => fderiv ℝ g z) (closedBall (0 : E) R)) :
     ∃ K : ℝ, 0 ≤ K ∧ ∀ z ∈ closedBall (0 : E) R, ‖fderiv ℝ g z‖ ≤ K := by
   obtain ⟨K, hK⟩ := (isCompact_closedBall (0 : E) R).exists_bound_of_continuousOn hcont
@@ -320,8 +320,8 @@ theorem norm_fderiv_iter_sub_le {f g : G → G} {L L₂ R e : ℝ} (N : ℕ)
       have hsplit : Af.comp Bf - Ag.comp Bg
           = (Af - Ag').comp Bf + ((Ag' - Ag).comp Bf + Ag.comp (Bf - Bg)) := by
         ext z
-        simp only [ContinuousLinearMap.coe_comp', ContinuousLinearMap.add_apply,
-          ContinuousLinearMap.sub_apply, Function.comp_apply, ContinuousLinearMap.map_sub]
+        simp only [ContinuousLinearMap.coe_comp, add_apply,
+          sub_apply, Function.comp_apply, ContinuousLinearMap.map_sub]
         abel
       rw [hsplit]
       -- the three terms of the chain rule
@@ -360,7 +360,7 @@ theorem norm_fderiv_iter_sub_le {f g : G → G} {L L₂ R e : ℝ} (N : ℕ)
                 rw [pow_succ]; nlinarith [pow_nonneg hxn 2]
               have hjN' : (j:ℝ) ≤ (N:ℝ) := Nat.cast_le.mpr hjle
               have hpw : L ^ (4 * j) ≤ L ^ (4 * N) := pow_le_pow_right₀ hL (by omega)
-              gcongr <;> positivity
+              gcongr
       have hT3 : ‖Ag.comp (Bf - Bg)‖ ≤ L * (B * j * L ^ j * ‖x‖ ^ 2) := by
         refine le_trans (ContinuousLinearMap.opNorm_comp_le _ _) ?_
         exact mul_le_mul (hgb _ hgmem) hprev (norm_nonneg _) hL0.le
@@ -551,7 +551,7 @@ lemma const_mul {a : E → ℝ} (c : ℝ) (ha : Van ρ k C a) :
     exact mul_le_mul_of_nonneg_left (ha.der y hy) (abs_nonneg c)
 
 /-- A finite sum, with the constants adding. -/
-lemma sum {ι : Type*} (s : Finset ι) {g : ι → E → F} (hC : 0 ≤ C)
+lemma sum {ι : Type*} (s : Finset ι) {g : ι → E → F} (_hC : 0 ≤ C)
     (h : ∀ i ∈ s, Van ρ k C (g i)) :
     Van ρ k (s.card * C) (fun y => ∑ i ∈ s, g i y) := by
   classical
@@ -649,7 +649,7 @@ lemma prod_sub {C D : ℝ} (hC : 0 ≤ C) (hD : 0 ≤ D) (d : ℕ) :
 
 /-- Postcomposition with a fixed continuous linear map. -/
 lemma clm_comp {G : Type*} [NormedAddCommGroup G] [NormedSpace ℝ G]
-    (L : F →L[ℝ] G) (hC : 0 ≤ C) (hg : Van ρ k C g) :
+    (L : F →L[ℝ] G) (_hC : 0 ≤ C) (hg : Van ρ k C g) :
     Van ρ k (‖L‖ * C) (fun y => L (g y)) where
   diff := fun y hy => L.differentiableAt.comp y (hg.diff y hy)
   val := fun y hy => by

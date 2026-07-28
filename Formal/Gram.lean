@@ -147,7 +147,7 @@ theorem cramer_KGamG (hann : ∑ j ∈ Finset.range (kk + 2), cz j • ((Amat f)
             ((KevalG (kk := kk) f y).mulVec (fun l : Fin (kk + 1) => cz (l : ℕ))) := by
       rw [KGamG, Matrix.mulVec_mulVec]
     rw [hrw, KevalG_mulVec_cz cz hann htop]
-    simp only [bKG, Matrix.mulVec, dotProduct, Pi.neg_apply]
+    simp only [bKG, Matrix.mulVec, dotProduct]
     rw [← Finset.sum_neg_distrib]
     exact Finset.sum_congr rfl fun i _ => by ring
   rw [hb, Matrix.cramer_eq_adjugate_mulVec, Matrix.mulVec_mulVec, Matrix.adjugate_mul,

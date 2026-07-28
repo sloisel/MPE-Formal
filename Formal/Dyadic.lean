@@ -64,7 +64,7 @@ lemma exists_dyadic_index {t : ℝ} (ht : 0 < t) :
         rw [one_div, Real.log_inv]
       have hpos : 0 < -Real.log t := by
         by_contra hc
-        push_neg at hc
+        push Not at hc
         have : Real.logb 2 (1/t) ≤ 0 := by
           rw [Real.logb, hlogt]
           exact div_nonpos_of_nonpos_of_nonneg hc (by linarith)
@@ -123,11 +123,11 @@ lemma min_one_div_le_dyadic {t y : ℝ} (ht : 0 < t) (K : ℕ) :
   -- `min(1, t/y) ≤ (1/2)^k₀`
   have hmin : min 1 (t / y) ≤ (1/2 : ℝ) ^ k₀ := by
     rcases Nat.eq_zero_or_pos k₀ with h0 | hpos
-    · rw [h0]; simpa using min_le_left (1:ℝ) (t/y)
+    · rw [h0]; simp
     · -- `k₀ ≥ 1`, so `k₀ - 1` fails the predicate: `y > 2^k₀ t`
       have hnot : ¬ (y ≤ 2 ^ ((k₀ - 1) + 1) * t) := Nat.find_min hex (by omega)
       rw [Nat.sub_add_cancel hpos] at hnot
-      push_neg at hnot
+      push Not at hnot
       have : t / y ≤ (1/2 : ℝ) ^ k₀ := by
         rw [div_le_iff₀ hy, div_pow, one_pow, div_mul_eq_mul_div, le_div_iff₀ (by positivity)]
         nlinarith
@@ -176,7 +176,7 @@ theorem lintegral_min_one_div_le
           rw [lintegral_add_left (by fun_prop)]
           congr 1
           · rw [lintegral_const]
-          · rw [lintegral_finset_sum _ (fun k _ => by
+          · rw [lintegral_finsetSum _ (fun k _ => by
               exact (measurable_const.mul ((measurable_indicator_const_iff 1).mpr
                 (hmeas k)))) ]
             refine Finset.sum_congr rfl fun k _ => ?_
@@ -190,7 +190,7 @@ theorem lintegral_min_one_div_le
   have hconst : ENNReal.ofReal ((1/2 : ℝ) ^ K) * μ Set.univ ≤ ENNReal.ofReal (M * t) := by
     calc ENNReal.ofReal ((1/2 : ℝ) ^ K) * μ Set.univ
         ≤ ENNReal.ofReal ((1/2 : ℝ) ^ K) * ENNReal.ofReal M :=
-          mul_le_mul_left' hμ _
+          mul_le_mul_right hμ _
       _ = ENNReal.ofReal ((1/2 : ℝ) ^ K * M) := (ENNReal.ofReal_mul (by positivity)).symm
       _ ≤ ENNReal.ofReal (M * t) := by
           refine ENNReal.ofReal_le_ofReal ?_
@@ -208,7 +208,7 @@ theorem lintegral_min_one_div_le
     calc ENNReal.ofReal ((1/2 : ℝ) ^ k) * μ {ω | Y ω ≤ 2 ^ (k+1) * t}
         ≤ ENNReal.ofReal ((1/2 : ℝ) ^ k) *
             ENNReal.ofReal (C₀ * (2 ^ (k+1) * t) * Lam (2 ^ (k+1) * t) ^ j) :=
-          mul_le_mul_left' (htail _ hu) _
+          mul_le_mul_right (htail _ hu) _
       _ = ENNReal.ofReal ((1/2 : ℝ) ^ k * (C₀ * (2 ^ (k+1) * t) * Lam (2 ^ (k+1) * t) ^ j)) :=
           (ENNReal.ofReal_mul (by positivity)).symm
       _ ≤ ENNReal.ofReal (2 * C₀ * t * Lam t ^ j) := by

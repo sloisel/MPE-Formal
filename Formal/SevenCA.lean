@@ -40,10 +40,10 @@ lemma krylov_zero {k : ℕ} (A : Matrix (Fin k) (Fin k) ℝ) : krylov A 0 = 0 :=
 /-- **Ob off.**  On the margin event the leading form `Δ_A` is small.  This is the paper's
 Lemma 4.1(ii), with the remainder absorbed into the `‖z‖` correction. -/
 theorem margin_to_krylov_gen {C : CycleData (Fin (M + 2) → ℝ)} (hd : C.d = M + 2)
-    {Amt : Matrix (Fin (M + 2)) (Fin (M + 2)) ℝ} {lc cR ρ₀ : ℝ} (hcR : 0 ≤ cR)
+    {Amt : Matrix (Fin (M + 2)) (Fin (M + 2)) ℝ} {lc cR ρ₀ : ℝ} (_hcR : 0 ≤ cR)
     (hsplit : ∀ y : Fin (M + 2) → ℝ, ‖y‖ ≤ ρ₀ →
       |C.sigt y - lc * (krylov Amt y).det| ≤ cR * ‖y‖ ^ (M + 3))
-    {z : Fin (M + 2) → ℝ} (hz : ‖z‖ ≤ ρ₀) {s' : ℝ} (hs' : 0 ≤ s')
+    {z : Fin (M + 2) → ℝ} (hz : ‖z‖ ≤ ρ₀) {s' : ℝ} (_hs' : 0 ≤ s')
     (hτ : C.τ z < s') :
     |lc| * |(krylov Amt z).det| ≤ (s' + cR * ‖z‖) * ‖z‖ ^ (M + 2) := by
   rcases eq_or_lt_of_le (norm_nonneg z) with hz0 | hz0

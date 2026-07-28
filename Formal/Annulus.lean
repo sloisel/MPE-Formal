@@ -95,7 +95,7 @@ def bigCube (kind : Fin N → BlockKind) : Set (Blk kind) :=
   Set.univ.pi fun i => cube (kind i).dim
 
 lemma measurableSet_bigCube (kind : Fin N → BlockKind) : MeasurableSet (bigCube kind) :=
-  MeasurableSet.univ_pi fun i => measurableSet_cube _
+  MeasurableSet.univ_pi fun _i => measurableSet_cube _
 
 /-- The product of the block probability measures. -/
 noncomputable def blkMeasure (kind : Fin N → BlockKind) : Measure (Blk kind) :=
@@ -152,7 +152,7 @@ lemma measurable_blkProd (kind : Fin N → BlockKind) : Measurable (blkProd kind
     ((kind i).measurable_factor.comp (measurable_pi_apply i)).abs
 
 lemma blkProd_nonneg (kind : Fin N → BlockKind) (u : Blk kind) : 0 ≤ blkProd kind u :=
-  Finset.prod_nonneg fun i _ => abs_nonneg _
+  Finset.prod_nonneg fun _i _ => abs_nonneg _
 
 /-- **The product estimate on the block space**, for the block probability measure. -/
 theorem tailBound_blkProd (kind : Fin (N+1) → BlockKind) :
@@ -160,7 +160,7 @@ theorem tailBound_blkProd (kind : Fin (N+1) → BlockKind) :
   tailBound_prod N (fun i => blockMeasure (kind i).dim)
     (fun i u => |(kind i).factor u|)
     (fun i => (kind i).measurable_factor.abs)
-    (fun i u => abs_nonneg _)
+    (fun _i _u => abs_nonneg _)
     (fun i => (kind i).anticonc)
 
 /-- **The product estimate for Lebesgue measure on the cube.** -/
@@ -171,7 +171,7 @@ theorem tailBound_blkProd_volume (kind : Fin (N+1) → BlockKind) :
   rw [volume_restrict_bigCube, Measure.smul_apply, smul_eq_mul]
   calc ENNReal.ofReal (2 ^ totDim kind) * blkMeasure kind {u | blkProd kind u ≤ v}
       ≤ ENNReal.ofReal (2 ^ totDim kind) * ENNReal.ofReal (5 ^ N * v * Lam v ^ N) :=
-        mul_le_mul_left' (tailBound_blkProd kind v hv) _
+        mul_le_mul_right (tailBound_blkProd kind v hv) _
     _ = ENNReal.ofReal ((2:ℝ) ^ totDim kind * (5 ^ N * v * Lam v ^ N)) :=
         (ENNReal.ofReal_mul (by positivity)).symm
     _ = ENNReal.ofReal (2 ^ totDim kind * 5 ^ N * v * Lam v ^ N) := by ring_nf
@@ -235,7 +235,7 @@ value. -/
 lemma exists_large_coord {kind : Fin N → BlockKind} {c : ℝ} (hc : 0 < c) {u : Blk kind}
     (hu : c ≤ ‖u‖) : ∃ (i : Fin N) (l : Fin (kind i).dim), c ≤ |u i l| := by
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have h1 : ∀ i, ‖u i‖ < c := by
     intro i
     refine (pi_norm_lt_iff hc).mpr fun l => ?_
@@ -376,7 +376,7 @@ theorem tailBound_blkRest (kind : Fin (N + 1 + 1) → BlockKind) (i : Fin (N + 1
           {w | |a * ∏ j, (kind (i.succAbove j)).factor (w j)| ≤ v}
       ≤ ENNReal.ofReal ((2:ℝ) ^ (kind i).dm)
         * ENNReal.ofReal (blkGammaConst (fun j => kind (i.succAbove j)) a * v * Lam v ^ N) :=
-        mul_le_mul_left' (tailBound_gammaBlkProd (fun j => kind (i.succAbove j)) ha v hv) _
+        mul_le_mul_right (tailBound_gammaBlkProd (fun j => kind (i.succAbove j)) ha v hv) _
     _ = ENNReal.ofReal ((2:ℝ) ^ (kind i).dm
           * (blkGammaConst (fun j => kind (i.succAbove j)) a * v * Lam v ^ N)) :=
         (ENNReal.ofReal_mul (by positivity)).symm
@@ -392,7 +392,7 @@ of `min(1, s/|h|)` — which is exactly the shape the dyadic lemma consumes.
 The two bounds on a fiber, `4s/|h|` from monotonicity and `2` from the length of the fiber,
 are combined *before* integrating: `min(2, 4s/|h|) ≤ 4·min(1, s/|h|)`. -/
 
-private lemma min_two_le {a : ℝ} (ha : 0 ≤ a) : min 2 (4 * a) ≤ 4 * min 1 a := by
+private lemma min_two_le {a : ℝ} (_ha : 0 ≤ a) : min 2 (4 * a) ≤ 4 * min 1 a := by
   rcases le_total a 1 with h | h
   · rw [min_eq_right h]
     exact min_le_right _ _
@@ -487,7 +487,7 @@ fibre stays a single interval on which `volume_fiber_le` applies. -/
 theorem measure_chart_gen_le
     {Rest : Type*} [MeasurableSpace Rest] {ν : Measure Rest} [SFinite ν]
     {I : Set ℝ} (hI : Convex ℝ I) (hIsub : I ⊆ Set.Icc (-1 : ℝ) 1)
-    (hImeas : MeasurableSet I)
+    (_hImeas : MeasurableSet I)
     {h : Rest → ℝ} {Q Q' G G' : ℝ → Rest → ℝ} {c₁ η s : ℝ}
     (hc₁ : 0 < c₁) (hη : 0 < η) (hs : 0 ≤ s)
     (hQ : ∀ r, ∀ t ∈ I, HasDerivAt (fun t => Q t r) (Q' t r) t)
@@ -579,7 +579,7 @@ theorem measure_chart_le'
     hhmeas.abs hM hC hs j hν (fun u hu => htail u hu.le)
   calc (4 : ℝ≥0∞) * ∫⁻ r, ENNReal.ofReal (min 1 (s / |h r|)) ∂ν
       ≤ 4 * ENNReal.ofReal ((4 * C + M) * s * Lam s ^ (j + 1)) :=
-        mul_le_mul_left' hdy _
+        mul_le_mul_right hdy _
     _ = ENNReal.ofReal (4 * (4 * C + M) * s * Lam s ^ (j + 1)) := by
         rw [show (4 : ℝ≥0∞) = ENNReal.ofReal 4 by simp,
           ← ENNReal.ofReal_mul (by norm_num : (0:ℝ) ≤ 4)]
@@ -603,7 +603,7 @@ theorem measure_discarded_le
   rw [h1]
   calc ENNReal.ofReal 2 * ν {r : Rest | |h r| ≤ 2 * η}
       ≤ ENNReal.ofReal 2 * ENNReal.ofReal (C * (2 * η) * Lam (2 * η) ^ j) :=
-        mul_le_mul_left' (htail _ (by positivity)) _
+        mul_le_mul_right (htail _ (by positivity)) _
     _ = ENNReal.ofReal (2 * (C * (2 * η) * Lam (2 * η) ^ j)) :=
         (ENNReal.ofReal_mul (by norm_num)).symm
 
@@ -634,7 +634,7 @@ theorem measure_chart_gen_le'
   have hdy := lintegral_min_one_div_le (μ := ν) (Y := fun r => c₁ * |h r|)
     (measurable_const.mul hhmeas.abs) hM hC hs j hν (fun u hu => htail u hu.le)
   calc (4 : ℝ≥0∞) * ∫⁻ r, ENNReal.ofReal (min 1 (s / (c₁ * |h r|))) ∂ν
-      ≤ 4 * ENNReal.ofReal ((4 * C + M) * s * Lam s ^ (j + 1)) := mul_le_mul_left' hdy _
+      ≤ 4 * ENNReal.ofReal ((4 * C + M) * s * Lam s ^ (j + 1)) := mul_le_mul_right hdy _
     _ = ENNReal.ofReal (4 * (4 * C + M) * s * Lam s ^ (j + 1)) := by
         rw [show (4 : ℝ≥0∞) = ENNReal.ofReal 4 by simp,
           ← ENNReal.ofReal_mul (by norm_num : (0:ℝ) ≤ 4)]
@@ -1162,7 +1162,7 @@ with no `‖u‖ ≥ c⋆` restriction, so no chart cover is needed: a single co
 serves everywhere.  Consequently the estimate holds on the full cube rather than on an
 annulus. -/
 
-lemma anticonc_abs : Anticonc unif1 (fun x => |x|) := fun v hv =>
+lemma anticonc_abs : Anticonc unif1 (fun x => |x|) := fun _v hv =>
   le_trans (unif1_abs_le hv) (ENNReal.ofReal_le_ofReal (min_le_right _ _))
 
 /-- The product of `|coordinates|` on the cube, for the uniform probability measure. -/
@@ -1179,7 +1179,7 @@ theorem tailBound_absProd_volume (M : ℕ) :
   rw [volume_restrict_cube, Measure.smul_apply, smul_eq_mul]
   calc ENNReal.ofReal ((2:ℝ) ^ (M + 1)) * blockMeasure (M + 1) {u | ∏ i, |u i| ≤ v}
       ≤ ENNReal.ofReal ((2:ℝ) ^ (M + 1)) * ENNReal.ofReal (5 ^ M * v * Lam v ^ M) :=
-        mul_le_mul_left' (tailBound_absProd M v hv) _
+        mul_le_mul_right (tailBound_absProd M v hv) _
     _ = ENNReal.ofReal ((2:ℝ) ^ (M + 1) * (5 ^ M * v * Lam v ^ M)) :=
         (ENNReal.ofReal_mul (by positivity)).symm
     _ = ENNReal.ofReal (2 ^ (M + 1) * 5 ^ M * v * Lam v ^ M) := by ring_nf

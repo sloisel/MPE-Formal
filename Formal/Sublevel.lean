@@ -149,7 +149,7 @@ theorem exists_sep {E : Set ℝ} (hEcl : IsClosed E) {a b : ℝ} (hsub : E ⊆ I
     intro j
     refine ⟨a, fun x hx => ?_⟩
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     have : cum E x = 0 := cum_le_bot hsub hlt
     have hx' : c j ≤ cum E x := hx
     rw [this] at hx'
@@ -164,7 +164,7 @@ theorem exists_sep {E : Set ℝ} (hEcl : IsClosed E) {a b : ℝ} (hsub : E ⊆ I
   have hlow : ∀ j ≤ N, ∀ x < t j, cum E x < c j := by
     intro j hj x hx
     by_contra hge
-    push_neg at hge
+    push Not at hge
     have : sInf (S j) ≤ x := csInf_le (hSbdd j) hge
     rw [htdef] at hx
     simp only [if_pos hj] at hx
@@ -328,7 +328,7 @@ theorem sublevel_one {k : ℕ} (hk : 0 < k) (φ : Polynomial ℝ) (hdeg : φ.nat
       rw [abs_mul]
       exact mul_le_mul (htS i).2 (hbasis i hi) (abs_nonneg _) (by positivity)
     rw [Finset.sum_const, hcard, nsmul_eq_mul] at habs
-    have : ((k : ℕ) + 1 : ℝ) = (k : ℝ) + 1 := by push_cast; ring
+    have : ((k : ℕ) + 1 : ℝ) = (k : ℝ) + 1 := by ring
     calc M ≤ |φ.eval xM| := hxMax
       _ ≤ ((k + 1 : ℕ) : ℝ) * ((ε * M) * ((b - a) ^ k / h ^ k)) := habs
       _ = ε * M * (((k : ℝ) + 1) * ((b - a) ^ k / h ^ k)) := by push_cast; ring
@@ -374,7 +374,7 @@ lemma norm_multiset_prod_complex (m : Multiset ℂ) :
     ‖m.prod‖ = (m.map fun z => ‖z‖).prod := by
   refine Multiset.induction_on m (by simp) ?_
   intro a s ih
-  simp [norm_mul, ih]
+  simp [ih]
 
 open Polynomial in
 /-- **The sublevel set of a polynomial, from its leading coefficient.**  If `p` has degree
@@ -414,7 +414,7 @@ theorem sublevel_root {p : Polynomial ℝ} {d : ℕ} (hd : 0 < d) (hdeg : p.natD
   have hqdeg : q.natDegree = d := by
     rw [hqdef, natDegree_map_eq_of_injective (algebraMap ℝ ℂ).injective, hdeg]
   have hcard : Multiset.card q.roots = q.natDegree :=
-    (Polynomial.splits_iff_card_roots).mp (IsAlgClosed.splits_codomain p)
+    (Polynomial.splits_iff_card_roots).mp (IsAlgClosed.splits q)
   have hcard' : Multiset.card q.roots = d := by rw [hcard, hqdeg]
   have hρd : ρ ^ d = s / |p.leadingCoeff| := by
     rw [hρdef, ← Real.rpow_natCast ((s / |p.leadingCoeff|) ^ ((d : ℝ)⁻¹)) d,
@@ -432,7 +432,7 @@ theorem sublevel_root {p : Polynomial ℝ} {d : ℕ} (hd : 0 < d) (hdeg : p.natD
       have hne := hnot z hzt
       have hre : 2 * ρ < |x - z.re| := by
         by_contra hle
-        push_neg at hle
+        push Not at hle
         rw [abs_le] at hle
         exact hne (by linarith [hle.1]) (by linarith [hle.2])
       calc 2 * ρ ≤ |x - z.re| := hre.le
@@ -617,7 +617,7 @@ lemma natDegree_det_le (M : Matrix (Fin k) (Fin k) (Polynomial ℝ))
   refine le_trans (Polynomial.natDegree_prod_le _ _) ?_
   calc ∑ i : Fin k, (M (σ i) i).natDegree ≤ ∑ _i : Fin k, p :=
         Finset.sum_le_sum fun i _ => h (σ i) i
-    _ = k * p := by simp [mul_comm]
+    _ = k * p := by simp []
 
 lemma coeff_det_top (M : Matrix (Fin k) (Fin k) (Polynomial ℝ))
     (h : ∀ i j, (M i j).natDegree ≤ p) :
@@ -656,7 +656,7 @@ noncomputable def gramPencil (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) :
 lemma gramPencil_eval (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) (t : ℝ) (i j : Fin k) :
     (gramPencil B₀ B₁ i j).eval t = ((B₀ + t • B₁)ᵀ * (B₀ + t • B₁)) i j := by
   rw [gramPencil, Matrix.mul_apply]
-  rw [Polynomial.eval_finset_sum]
+  rw [Polynomial.eval_finsetSum]
   refine Finset.sum_congr rfl fun l _ => ?_
   simp only [Polynomial.eval_mul, Polynomial.eval_add, Polynomial.eval_C, Polynomial.eval_X,
     Matrix.transpose_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
@@ -803,7 +803,7 @@ theorem sublevel_slice {n d : ℕ} (hd : 0 < d) {c : ℝ} (hc : c ≠ 0)
     · have hempty : {t : ℝ | Fin.cons t u ∈ S} = ∅ := by
         have hu' : ∃ j, K < |u j| := by
           by_contra hcon
-          push_neg at hcon
+          push Not at hcon
           exact hu (fun i => hcon i)
         obtain ⟨j, hj⟩ := hu'
         ext t
@@ -853,7 +853,7 @@ lemma shearMat_mulVec {n : ℕ} (v' w : Fin (n + 1) → ℝ) :
     Finset.sum_add_distrib, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
   congr 1
   · simp [ite_mul, Finset.sum_ite_eq]
-  · simp [ite_mul, Finset.sum_ite_eq', mul_comm]
+  · simp [Finset.sum_ite_eq', mul_comm]
 
 /-- Unipotent lower-triangular: determinant `1`. -/
 lemma det_shearMat {n : ℕ} {v' : Fin (n + 1) → ℝ} (hv' : v' 0 = 0) :
@@ -892,8 +892,8 @@ theorem sublevel_dir {n d : ℕ} (hd : 0 < d) {c : ℝ} (hc : c ≠ 0)
   have hv'le : ∀ i, |v' i| ≤ ‖v‖ := by
     intro i
     by_cases hi : i = 0
-    · subst hi; rw [hv'0]; simpa using norm_nonneg v
-    · have : v' i = v i := by simp [hv'def, Pi.single_apply, hi]
+    · subst hi; rw [hv'0]; simp
+    · have : v' i = v i := by simp [hv'def, hi]
       rw [this]
       simpa [Real.norm_eq_abs] using norm_le_pi_norm v i
   set L : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin (n + 1) → ℝ) := Matrix.toLin' (shearMat v') with hLdef
@@ -937,7 +937,7 @@ theorem sublevel_dir {n d : ℕ} (hd : 0 < d) {c : ℝ} (hc : c ≠ 0)
     ext i
     refine Fin.cases ?_ (fun j => ?_) i
     · simp [hv'0, hv0]
-    · simp [hv'def, Pi.single_apply]
+    · simp [hv'def]
   have hGval : ∀ (u : Fin n → ℝ) (t : ℝ),
       (F ∘ L) (Fin.cons t u) = (P (Fin.cons (0:ℝ) u)).eval t := by
     intro u t

@@ -112,7 +112,7 @@ lemma isTorsionBy_charpoly (A : Matrix (Fin n) (Fin n) ℝ) :
 
 /-- **Obligation 2.**  With `charpoly` squarefree, `ℝⁿ` is the internal direct sum of the
 `fᵢ`-torsion submodules, one for each distinct irreducible factor. -/
-theorem isInternal_torsion (A : Matrix (Fin n) (Fin n) ℝ) (hsq : Squarefree A.charpoly)
+theorem isInternal_torsion (A : Matrix (Fin n) (Fin n) ℝ) (_hsq : Squarefree A.charpoly)
     {S : Finset ℝ[X]} (hprod : (∏ f ∈ S, f) = A.charpoly)
     (hcop : (S : Set ℝ[X]).Pairwise (Function.onFun IsCoprime id)) :
     DirectSum.IsInternal fun f : S => Submodule.torsionBy ℝ[X] (AMod A) (f : ℝ[X]) := by
@@ -421,8 +421,8 @@ theorem norm_prod_eq {R S T : Type*} [CommRing R] [CommRing S] [CommRing T]
     ext i j
     cases i <;> cases j <;>
       simp [Algebra.leftMulMatrix_eq_repr_mul, Prod.mul_def,
-        Module.Basis.prod_apply_inl_fst, Module.Basis.prod_apply_inl_snd,
-        Module.Basis.prod_apply_inr_fst, Module.Basis.prod_apply_inr_snd]
+        
+        ]
   rw [hM, Matrix.det_fromBlocks_zero₁₂]
 
 /-! ### Obligation 3e, step 3: the Krylov determinant is a norm

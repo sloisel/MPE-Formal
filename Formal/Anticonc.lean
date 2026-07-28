@@ -35,7 +35,7 @@ variable {n : ℕ}
 lemma krylov_smul (A : Matrix (Fin n) (Fin n) ℝ) (r : ℝ) (z : Fin n → ℝ) :
     krylov A (r • z) = r • krylov A z := by
   ext i j
-  simp only [krylov_apply, Matrix.smul_apply, Pi.smul_apply, smul_eq_mul]
+  simp only [krylov_apply, Matrix.smul_apply, smul_eq_mul]
   rw [Matrix.mulVec_smul]
   rfl
 
@@ -328,7 +328,7 @@ theorem shell_cube_bound (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1))
       ≤ volume ((fun z => P⁻¹.mulVec z) ⁻¹' T) := measure_mono hsub
     _ = ENNReal.ofReal |P.det| * volume T := volume_preimage_mulVec hP T
     _ ≤ _ := by
-        refine mul_le_mul_left' ?_ _
+        refine mul_le_mul_right ?_ _
         refine measure_sublevel_cube_le M hγ hη hs (measurable_remScaled P r)
           (fun u' t => hasDerivAt_remScaled P r u' t) ?_
         intro u' hu t ht
@@ -418,8 +418,8 @@ theorem lemma7_volume (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1))
             refine mul_le_mul_of_nonneg_left ?_ hs.le
             exact mul_le_mul_of_nonneg_left hzp hr0
         _ = s * r ^ (M + 2) := by ring
-    refine le_trans (mul_le_mul_left' (measure_mono hsub) _) ?_
-    refine le_trans (mul_le_mul_left'
+    refine le_trans (mul_le_mul_right (measure_mono hsub) _) ?_
+    refine le_trans (mul_le_mul_right
       (shell_cube_bound hq hA hP hlam hAP hcontr hr hr1 hs) _) ?_
     set X₁ : ℝ := 4 * (4 * Γ + 2 ^ (M + 1)) * s * Lam s ^ (M + 1) with hX₁
     set X₂ : ℝ := 2 * (Γ * (2 * etaOf A q P r) * Lam (2 * etaOf A q P r) ^ M) with hX₂
@@ -592,7 +592,7 @@ theorem lemma7_prob {Sig : (Fin (M + 2) → ℝ) → ℝ} {ρ : ℝ}
           (s * Lam s ^ (M + 1) + (2 * δ) * Lam (2 * δ) ^ M)) := by
     refine le_trans (measure_mono hsub) ?_
     rw [volume_preimage_affine hδ x T]
-    exact mul_le_mul_left' (hCA (2 * δ) s h2δ hδ1 hs hs1) _
+    exact mul_le_mul_right (hCA (2 * δ) s h2δ hδ1 hs hs1) _
   -- undo the normalization of `blockMeasure`
   have hcube : volume (S ∩ cube (M + 2)) = ENNReal.ofReal ((2:ℝ) ^ (M + 2)) *
       blockMeasure (M + 2) S := by

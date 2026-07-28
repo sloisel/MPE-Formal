@@ -142,6 +142,7 @@ theorem dither_gen (C : CycleData E) (μ : Measure Ω) {d s : ℕ → ℝ}
   rw [hcycle m ω]
   exact hstep m (y m ω) hypos hyle hmem
 
+omit [MeasurableSpace Ω] in
 /-- **The enlarged margin dominates `M₀‖y‖`.**  This is the bridge to Lemma 4.4(ii): with
 the threshold `s m ≥ 2 M₀ * d m` of the paper's Theorem 4.9, every good cycle satisfies the
 hypothesis `τ(y) ≥ M₀‖y‖` of that lemma, and hence has `D ≠ 0`.  Under the deleted

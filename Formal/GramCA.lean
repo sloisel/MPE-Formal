@@ -33,7 +33,7 @@ private lemma abs_sub_le_add' (a b : ℝ) : |a - b| ≤ |a| + |b| := by
 degree: if `σ̃ = lc·Dl + O(r^{dd+1})` and the margin drops below `s'`, then `Dl` is small. -/
 theorem margin_to_form {C : CycleData (Fin (M + 2) → ℝ)} {dd : ℕ} (hd : C.d = dd)
     {Dl : (Fin (M + 2) → ℝ) → ℝ} (hDl0 : Dl 0 = 0)
-    {lc cR ρ₀ : ℝ} (hcR : 0 ≤ cR)
+    {lc cR ρ₀ : ℝ} (_hcR : 0 ≤ cR)
     (hsplit : ∀ y : Fin (M + 2) → ℝ, ‖y‖ ≤ ρ₀ →
       |C.sigt y - lc * Dl y| ≤ cR * ‖y‖ ^ (dd + 1))
     {z : Fin (M + 2) → ℝ} (hz : ‖z‖ ≤ ρ₀) {s' : ℝ} (hs' : 0 ≤ s')

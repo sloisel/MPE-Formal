@@ -49,7 +49,7 @@ lemma gkry_add_smul (A : Matrix (Fin n) (Fin n) ℝ) (a v : Fin n → ℝ) (t : 
 lemma gkry_smul (A : Matrix (Fin n) (Fin n) ℝ) (r : ℝ) (x : Fin n → ℝ) :
     gkry (k := k) A (r • x) = r • gkry (k := k) A x := by
   ext i j
-  simp only [gkry, Matrix.of_apply, Matrix.smul_apply, Pi.smul_apply, smul_eq_mul]
+  simp only [gkry, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul]
   rw [Matrix.mulVec_smul]
   rfl
 
@@ -185,7 +185,7 @@ theorem le_natDegree_minpoly_of_gramDelta_ne
     kk + 1 ≤ (minpoly ℝ A).natDegree := by
   classical
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hdlt : (minpoly ℝ A).natDegree < kk + 1 := hcon
   set c : Fin (kk + 1) → ℝ := fun j => (minpoly ℝ A).coeff (j : ℕ) with hcdef
   -- `c ≠ 0`: the leading coefficient of a monic polynomial sits at an index `< k`
@@ -211,7 +211,7 @@ theorem le_natDegree_minpoly_of_gramDelta_ne
       simp only [Matrix.mulVec, dotProduct, gkry, Matrix.of_apply, hcdef]
       refine Finset.sum_congr rfl fun j _ => ?_
       simp only [Matrix.mul_smul, Matrix.smul_apply, smul_eq_mul, Finset.sum_mul,
-        Finset.mul_sum]
+        ]
       exact Finset.sum_congr rfl fun l _ => by ring
     rw [hlhs]
     have hstep : ∑ j ∈ Finset.range (kk + 1),
@@ -263,7 +263,7 @@ theorem exists_gramDelta_ne {A : Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ}
     rw [Matrix.sum_mulVec, Finset.sum_apply]
     simp only [Matrix.mulVec, dotProduct, gkry, Matrix.of_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
-    simp only [Matrix.mul_smul, Matrix.smul_apply, smul_eq_mul, Finset.sum_mul, Finset.mul_sum]
+    simp only [Matrix.mul_smul, Matrix.smul_apply, smul_eq_mul, Finset.sum_mul]
     exact Finset.sum_congr rfl fun l _ => by ring
   -- `A - I` invertible strips it off, so `m_A ∣ p`
   have hpv : ((Polynomial.aeval A) p).mulVec v = 0 := by

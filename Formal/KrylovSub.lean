@@ -27,7 +27,7 @@ variable {n : ℕ}
 lemma krylov_smul' (A : Matrix (Fin n) (Fin n) ℝ) (r : ℝ) (z : Fin n → ℝ) :
     krylov A (r • z) = r • krylov A z := by
   ext i j
-  simp only [krylov_apply, Matrix.smul_apply, Pi.smul_apply, smul_eq_mul]
+  simp only [krylov_apply, Matrix.smul_apply, smul_eq_mul]
   rw [Matrix.mulVec_smul]
   rfl
 

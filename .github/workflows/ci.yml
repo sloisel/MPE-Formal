@@ -34,13 +34,13 @@ jobs:
       # no axiom beyond propext/Classical.choice/Quot.sound.  That is what rules out
       # `sorryAx` — a `sorry` is otherwise only a warning and would not fail a build.
       #
-      # No `build-args` yet.  `--wfail` turns warnings into errors and so would also
-      # catch a `sorry`, which is the standard way to do this — but the tree currently
-      # emits 105 warnings (34 unused variables, 37 mathlib deprecations, 22 unused
-      # simp arguments, 7 dead tactics, plus a few section-variable ones), so adopting
-      # it is a cleanup first.  Until then a `sorry` is caught by the per-theorem axiom
-      # check in Formal/Statement.lean for everything the three theorems reach, and
-      # environment-wide by the weekly nanoda run in recheck.yml.
+      # `--wfail` turns warnings into errors.  That is the standard way to catch a
+      # `sorry`, which is otherwise only a warning and would not fail a build, and it
+      # keeps the tree warning-clean rather than letting linter noise accumulate.
+      # Safe against mathlib's deprecation schedule only because mathlib is pinned by
+      # commit in lake-manifest.json: a bump may surface new deprecations, and fixing
+      # them is then part of the bump.
       - uses: leanprover/lean-action@v1
         with:
           use-mathlib-cache: true
+          build-args: "--wfail"

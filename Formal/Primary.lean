@@ -333,8 +333,8 @@ lemma aeval_mulVec_internalEquiv
   exact (Finset.sum_congr rfl fun i _ => coe_aeval_restrictKer A (ff i) g (w i)).symm
 
 /-- **A cyclic vector.**  A vector whose primary components are all nonzero is cyclic. -/
-theorem det_krylov_internalEquiv_ne_zero (hn : 0 < n) (hN : 0 < N)
-    (hirr : ∀ i, Irreducible (ff i)) (hmon : ∀ i, (ff i).Monic)
+theorem det_krylov_internalEquiv_ne_zero (_hn : 0 < n) (hN : 0 < N)
+    (hirr : ∀ i, Irreducible (ff i)) (_hmon : ∀ i, (ff i).Monic)
     (hpw : Pairwise fun i j => IsCoprime (ff i) (ff j)) (hprod : ∏ i, ff i = A.charpoly)
     (w : ∀ i, LinearMap.ker (Matrix.mulVecLin (aeval A (ff i)))) (hw : ∀ i, w i ≠ 0) :
     (krylov A (internalEquiv _ (isInternal_ker A ff hN hpw hprod) w)).det ≠ 0 := by

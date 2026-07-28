@@ -538,7 +538,7 @@ theorem shell_cube_bound_gen (D : ShellData A)
     _ ≤ ENNReal.ofReal J * ((2 * totDim D.kind : ℕ)
           * (ENNReal.ofReal (4 * (4 * C + Mc) * s * Lam s ^ (D.Nb - 1 + 1))
             + ENNReal.ofReal (2 * (C * (2 * η) * Lam (2 * η) ^ (D.Nb - 1))))) := by
-        exact mul_le_mul_left' hshell _
+        exact mul_le_mul_right hshell _
     _ ≤ _ := by
         rw [mul_add, ← ENNReal.ofReal_natCast (2 * totDim D.kind),
           ← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity),
@@ -568,7 +568,7 @@ theorem shell_cube_bound_gen (D : ShellData A)
 that it serves the general block estimate as well as the all-lines one.  `cc` is the constant
 in `η = cc · r`. -/
 theorem lemma7_of_shell {S : (Fin (M + 2) → ℝ) → ℝ} {C₁ C₂ cc ρ : ℝ} (hC₁ : 0 ≤ C₁)
-    (hC₂ : 0 ≤ C₂) (hcc : 1 ≤ cc) (hρ0 : 0 < ρ)
+    (hC₂ : 0 ≤ C₂) (hcc : 1 ≤ cc) (_hρ0 : 0 < ρ)
     (hbnd : ∀ r s : ℝ, 0 < r → r ≤ ρ → 0 < s →
       volume ({z : Fin (M + 2) → ℝ |
           |S (r • z)| ≤ s * r ^ (M + 2)} ∩ cube (M + 2)
@@ -632,8 +632,8 @@ theorem lemma7_of_shell {S : (Fin (M + 2) → ℝ) → ℝ} {C₁ C₂ cc ρ : �
             refine mul_le_mul_of_nonneg_left ?_ hs.le
             exact mul_le_mul_of_nonneg_left hzp hr0
         _ = s * r ^ (M + 2) := by ring
-    refine le_trans (mul_le_mul_left' (measure_mono hsub) _) ?_
-    refine le_trans (mul_le_mul_left' (hbnd r s hr hr1 hs) _) ?_
+    refine le_trans (mul_le_mul_right (measure_mono hsub) _) ?_
+    refine le_trans (mul_le_mul_right (hbnd r s hr hr1 hs) _) ?_
     set X₁ : ℝ := C₁ * s * Lam s ^ (M + 1) with hX₁
     set X₂ : ℝ := C₂ * (2 * (cc * r)) * Lam (2 * (cc * r)) ^ M with hX₂
     have hX₁0 : 0 ≤ X₁ := by rw [hX₁]; positivity

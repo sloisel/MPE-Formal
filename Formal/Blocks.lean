@@ -55,7 +55,7 @@ invoked in this file. -/
 theorem tailBound_mul {Ω₁ Ω₂ : Type*} [MeasurableSpace Ω₁] [MeasurableSpace Ω₂]
     {μ₁ : Measure Ω₁} {μ₂ : Measure Ω₂} [IsProbabilityMeasure μ₁] [IsProbabilityMeasure μ₂]
     {X : Ω₁ → ℝ} {Y : Ω₂ → ℝ} (hXm : Measurable X) (hYm : Measurable Y)
-    (hXnn : ∀ ω, 0 ≤ X ω) (hYnn : ∀ ω, 0 ≤ Y ω)
+    (_hXnn : ∀ ω, 0 ≤ X ω) (_hYnn : ∀ ω, 0 ≤ Y ω)
     (hX : Anticonc μ₁ X) {C : ℝ} (hC : 0 ≤ C) {j : ℕ} (hY : TailBound μ₂ Y C j) :
     TailBound (μ₁.prod μ₂) (fun p => X p.1 * Y p.2) (4 * C + 1) (j + 1) := by
   intro t ht
@@ -127,8 +127,7 @@ theorem tailBound_prod : ∀ (N : ℕ) {E : Fin (N+1) → Type} [∀ i, Measurab
   intro N
   induction N with
   | zero =>
-      intro E _ μ _ X hXm _ hX
-      intro v hv
+      intro E _ μ _ X hXm _ hX v hv
       have hmeasS : MeasurableSet {y : E 0 | X 0 y ≤ v} :=
         measurableSet_le (hXm 0) measurable_const
       have hset : {x : ∀ i, E i | ∏ i, X i (x i) ≤ v}
@@ -203,7 +202,7 @@ instance : IsProbabilityMeasure unif1 := by
   norm_num
 
 /-- `unif1 {|x| ≤ v} = min(1, v)` for `v ≥ 0`; we only need `≤`. -/
-lemma unif1_abs_le {v : ℝ} (hv : 0 ≤ v) :
+lemma unif1_abs_le {v : ℝ} (_hv : 0 ≤ v) :
     unif1 {x : ℝ | |x| ≤ v} ≤ ENNReal.ofReal (min 1 v) := by
   have hset : {x : ℝ | |x| ≤ v} = Set.Icc (-v) v := by
     ext x; simp [abs_le]

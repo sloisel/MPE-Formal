@@ -44,7 +44,7 @@ lemma preimage_smul_excl {r : ℝ} (hr : 0 < r) (t : ℝ) :
     (fun b : Fin n → ℝ => r • b) ⁻¹' (excl f t) = excl f t := by
   ext b
   simp only [Set.mem_preimage, excl, Set.mem_setOf_eq, QtR_smul, norm_smul, Real.norm_eq_abs,
-    abs_of_pos hr, mul_pow, abs_mul, abs_pow, abs_of_pos hr]
+    mul_pow, abs_mul, abs_pow, abs_of_pos hr]
   constructor
   · intro h
     have hrn : (0:ℝ) < r ^ n := pow_pos hr n

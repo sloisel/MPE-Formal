@@ -134,7 +134,7 @@ open Real in
 `k = deg m_A` (carried as a monic annihilating polynomial `cz` of degree `k`), and the
 degeneracy form `Δ = det(KᵀK)` not identically zero — which is the paper's Lemma 4.2(i),
 automatic at that window.  No nonderogatory hypothesis. -/
-theorem theorem47_gram (hkn : kk + 1 ≤ M + 2) (hA : IsUnit (Amat f - 1))
+theorem theorem47_gram (hkn : kk + 1 ≤ M + 2) (_hA : IsUnit (Amat f - 1))
     (cz : ℕ → ℝ) (hann : ∑ i ∈ Finset.range (kk + 2), cz i • ((Amat f) ^ i) = 0)
     (htop : cz (kk + 1) = 1) (hlc : (∑ i ∈ Finset.range (kk + 2), cz i) ≠ 0)
     (hnd : ∃ v : Fin (M + 2) → ℝ, gramDelta (k := kk + 1) (Amat f) v ≠ 0)

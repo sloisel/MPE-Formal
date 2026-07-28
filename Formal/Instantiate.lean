@@ -252,7 +252,7 @@ variable {A q}
 
 lemma isHomogeneous_lin (M : Matrix (Fin n) (Fin n) ℝ) (i : Fin n) :
     (lin M i).IsHomogeneous 1 :=
-  MvPolynomial.IsHomogeneous.sum _ _ _ fun k _ => MvPolynomial.isHomogeneous_C_mul_X _ _
+  MvPolynomial.IsHomogeneous.sum _ _ _ fun _k _ => MvPolynomial.isHomogeneous_C_mul_X _ _
 
 lemma homogeneousComponent_one_lin (M : Matrix (Fin n) (Fin n) ℝ) (i : Fin n) :
     homogeneousComponent 1 (lin M i) = lin M i :=
@@ -664,7 +664,7 @@ theorem sharp_estimate (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1)) :
     have h := congrFun (factorization_construction (A := A) (q := q) hq) i
     rw [← eval_map_mulVec (A - 1) (fun i => homogeneousComponent (n + 2) (Nt A q i)) y i]
     rw [h]
-    simp only [Pi.neg_apply, Pi.smul_apply, smul_eq_mul, map_neg, map_mul, map_sum, hRm,
+    simp only [Pi.neg_apply, Pi.smul_apply, smul_eq_mul, map_neg, map_mul, map_sum, 
       hW, hDy, Wpoly, Pi.smul_apply, smul_eq_mul]
     simp [Finset.sum_apply, map_sum, map_mul]
   -- bound each piece

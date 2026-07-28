@@ -35,7 +35,7 @@ lemma rpow_npow_comm {β : ℝ} (hβ : 0 ≤ β) (p : ℝ) (m : ℕ) :
 /-- **The termwise bound.**  A schedule dominated geometrically, with a weight that grows
 geometrically, has terms dominated by a geometric series of ratio `βᵖλᵏ`. -/
 theorem sched_term_le {δ p β lam : ℝ} {k : ℕ} {t : ℕ → ℝ}
-    (hδ0 : 0 < δ) (hp : 0 ≤ p) (hβ0 : 0 ≤ β) (hlam : 0 ≤ lam)
+    (hδ0 : 0 < δ) (hp : 0 ≤ p) (hβ0 : 0 ≤ β) (_hlam : 0 ≤ lam)
     (ht0 : ∀ m, 0 < t m)
     (htβ : ∀ m, t m ≤ δ * β ^ m)
     (htΛ : ∀ m, Lam (t m) ≤ lam ^ m * Lam δ)

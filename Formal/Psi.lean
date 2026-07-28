@@ -33,9 +33,10 @@ def rangeEquivFin (k : ℕ) : Fin k ≃ ↥(Finset.range k) where
 def finRestrict (k : ℕ) (ω : ℕ → B) : Fin k → B := fun i => ω (i : ℕ)
 
 lemma measurable_finRestrict (k : ℕ) : Measurable (finRestrict (B := B) k) :=
-  measurable_pi_lambda _ fun i => measurable_pi_apply _
+  measurable_pi_lambda _ fun _i => measurable_pi_apply _
 
-@[simp] lemma finRestrict_castSucc (k : ℕ) (ω : ℕ → B) :
+omit [MeasurableSpace B] in
+lemma finRestrict_castSucc (k : ℕ) (ω : ℕ → B) :
     (fun j : Fin k => finRestrict (k + 1) ω j.castSucc) = finRestrict k ω := by
   funext j; rfl
 
@@ -270,7 +271,7 @@ lemma measurable_cycleData_sigt (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1
 
 lemma measurable_cycleData_Ntil (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1)) :
     Measurable (cycleData hq hA).Ntil :=
-  measurable_pi_lambda _ fun i => (MvPolynomial.continuous_eval _).measurable
+  measurable_pi_lambda _ fun _i => (MvPolynomial.continuous_eval _).measurable
 
 lemma measurable_cycleData_S (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1)) :
     Measurable (cycleData hq hA).S := by
@@ -353,7 +354,7 @@ theorem slice_bound {Sig : (Fin (M + 2) → ℝ) → ℝ} {ρ : ℝ}
 Lemma 4.8 uniformly in the past.  This is the hypothesis `MPE.dither_sharp` takes. -/
 theorem hPsi {ρ : ℝ} (C : CycleData (Fin (M + 2) → ℝ)) (B : SharpBound C)
     (x₀ : Fin (M + 2) → ℝ) {δ θ : ℝ}
-    (hδ : 0 < δ) (hδ1 : δ ≤ 1) (h2δ : 2 * δ ≤ 1) (hθ : 1 ≤ θ)
+    (hδ : 0 < δ) (hδ1 : δ ≤ 1) (_h2δ : 2 * δ ≤ 1) (hθ : 1 ≤ θ)
     (hx₀ : ‖x₀‖ ≤ δ)
     (hslack : ∀ m, 8 * B.C₁ * (sched δ θ m) ^ (2 - θ) ≤ 1)
     (hs1 : ∀ m, 16 * B.C₂ * (sched δ θ m) ^ (3 - θ) ≤ 1)

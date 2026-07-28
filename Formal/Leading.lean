@@ -188,11 +188,11 @@ theorem homogeneousComponent_adjugate {m : ℕ}
   ext a b
   by_cases hab : a = j
   · subst hab
-    simp only [Matrix.of_apply, if_pos rfl, Matrix.updateRow_self]
+    simp only [Matrix.of_apply, Matrix.updateRow_self]
     by_cases hbi : b = i
     · subst hbi
-      simpa using homogeneousComponent_zero_of_constant (σ := σ) 1
-    · simp [Pi.single_apply, hbi]
+      simp
+    · simp [hbi]
   · simp [Matrix.of_apply, if_neg hab, Matrix.updateRow_ne hab]
 
 /-- Components below the guaranteed degree vanish. -/

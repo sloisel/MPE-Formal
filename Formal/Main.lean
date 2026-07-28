@@ -107,6 +107,7 @@ def goodSharp (C : CycleData E) (B : SharpBound C) (δ θ : ℝ) (y : ℕ → Ω
     Set Ω :=
   {ω | 16 * B.C₂ * (sched δ θ m) ^ (3 - θ) ≤ C.τ (y m ω)}
 
+omit [MeasurableSpace Ω] in
 /-- **Condition (a) for Theorem 4.9**, extracted so that the schedule invariant
 `‖x_m‖ ≤ δ_m` can be re-derived wherever it is needed — in particular when *proving* `hΨ`,
 which must know that the centre of the dither ball is inside the schedule. -/
@@ -147,6 +148,7 @@ theorem sharp_step
     _ ≤ (sched δ θ m) ^ θ :=
         contraction_sharp B.hC₁ B.hC₂ hδm hypos hyle (hslack m)
 
+omit [MeasurableSpace Ω] in
 /-- **The schedule invariant.**  On the first `m` good events the run is still inside the
 schedule.  This is what `hΨ` needs: it puts the centre of the `m`-th dither ball within
 `δ_m` of the fixed point, which is the hypothesis of Lemma 4.8. -/

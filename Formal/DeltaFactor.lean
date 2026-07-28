@@ -237,7 +237,7 @@ the change of coordinates is just `z ↦ P⁻¹ z`.  No conjugate pairing is nee
 
 /-- Coordinates on a product of one-dimensional blocks. -/
 noncomputable def lineBlocksEquiv (m : ℕ) :
-    (Fin m → ℝ) ≃ₗ[ℝ] (∀ i : Fin m, Fin (BlockKind.line).dim → ℝ) where
+    (Fin m → ℝ) ≃ₗ[ℝ] (∀ _i : Fin m, Fin (BlockKind.line).dim → ℝ) where
   toFun w := fun i _ => w i
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
