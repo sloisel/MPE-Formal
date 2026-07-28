@@ -2,18 +2,22 @@ import Mathlib
 import Formal.CThree
 import Formal.SevenFull
 import Formal.Undithered
+import Formal.GramFull
 
 /-!
 # What is proved
 
 This file exists to be **read**.  Its theorems have statements that mention *no definition
 from this development* — only mathlib notions
-(`Matrix`, `Matrix.adjugate`, `Matrix.det`, `ContDiffOn`, `fderiv`, `LinearMap.toMatrix'`,
+(`Matrix`, `Matrix.det`, `Matrix.adjugate`, `Matrix.cramer`, `Matrix.transpose`,
+`Matrix.charpoly`, `minpoly`, `Squarefree`, `ContDiffOn`, `fderiv`, `LinearMap.toMatrix'`,
 `Measure.pi`, `Measure.infinitePi`, `volume`, `Real.log`, `‖·‖`).  Every object of the
 construction is introduced by an explicit defining equation in the hypotheses, so that a
 reader who accepts mathlib can audit the claim without reading anything else.
 
-**Every proof in this file is a one-line reference**: the work is in `Formal/CThree.lean`.
+**Every proof in this file is a one-line reference.**  The work is in
+`Formal/GramFull.lean` (Theorem 4.7), `Formal/CThree.lean` (4.9) and
+`Formal/Undithered.lean` (5.5).
 Lean has no notion of "stated but unproved" — the only way to write a statement without
 proving it is `axiom`, which *assumes* it and shows up in `#print axioms`.  So a statement
 file is one whose proof bodies are single references, which is what this is.
@@ -26,10 +30,10 @@ Two mechanical checks complete the audit, and are run at the bottom of this file
 
 ## Which paper theorem is which
 
-The paper (after the revision that promoted the quadratic corollary) states four theorems:
-3.1 (the counterexample), 4.7 (dithered restarts, `C²`, no spectral hypothesis beyond
-`I - A` invertible and `A` nonderogatory), 4.9 (quadratic order under simple spectrum), and
-5.5 (the undithered algorithm).  Their formalizations are:
+The paper states four theorems: 3.1 (the counterexample), 4.7 (dithered restarts, `C²`, no
+spectral hypothesis beyond `I - A` invertible), 4.9 (quadratic order under simple spectrum),
+and 5.5 (the undithered algorithm).  The three probabilistic ones are formalized, one Lean
+theorem each; the counterexample is not:
 
 | paper | Lean |
 | --- | --- |
@@ -37,18 +41,35 @@ The paper (after the revision that promoted the quadratic corollary) states four
 | Theorem 4.9 | `mpe_quadratic`, below |
 | Theorem 5.5 | `mpe_undithered`, below |
 
-`mpe_quadratic` formalizes **both** clauses of the paper's Theorem 4.9.  Its failure event
-is the union of the two: the schedule invariant `‖xₖ‖ ≤ δₖ` breaking, *or* the
-least-squares system being singular (`det U = 0`) at some cycle.  Both are controlled by
-the same good event, because the threshold `sₘ = max(16C₂/K, 2M₀)·δₘ` is of the same order
-as `δₘ` — which is exactly what the doubly-exponential schedule `δₘ = δ^(θᵐ)` of
-Theorem 4.7 could not achieve, its threshold there being `δₘ^(3-θ) ≪ δₘ`.
+`mpe_dithered` is Theorem 4.7 as the paper states it: the window is `k = deg m_A` — so `A`
+may be **derogatory** — the cleared form is built from the normal matrix `Γ = UᵀU` by
+Cramer's rule, the degeneracy form is `Δ = det(KᵀK)` of degree `d = 2k` (the paper's
+`(2.5)`), and the failure probability is `C·δ^((2-θ)/d) = C·δ^((2-θ)/(2k))`.
+
+The paper adds a parenthetical for the nonderogatory case: at `k = n` one may instead take
+`c̃ = adj(U)(-u_n)` and the smaller `Δ = det K` of degree `n` (`(2.6)`), which multiplies
+`D`, `c̃`, `σ̃`, `Ñ` by `det U`, leaves `S` unchanged, and improves the exponent to
+`(2-θ)/n`.  That variant is proved in this development too — `mpe_dithered_C2_stmt` in
+`Formal/SevenFull.lean`, an independent proof, not a corollary — but it is not restated
+here: this file carries exactly one Lean theorem per paper theorem.
+
+`mpe_quadratic` formalizes **all** clauses of the paper's Theorem 4.9.  Its failure event
+is the union of the three: the schedule invariant `‖xₖ‖ ≤ δₖ` breaking, the least-squares
+system being singular (`det U = 0`) at some cycle — the paper's "the system `(2.3)`
+being nonsingular, so that MPE and RRE agree" — or a cycle being undefined in the cleared
+form (`σ̃ = 0`).  All three are controlled by the same good event; `det U ≠ 0` needs the
+threshold `sₘ = max(16C₂/K, 2M₀)·δₘ` to be of the same order as `δₘ` — which is exactly
+what the doubly-exponential schedule `δₘ = δ^(θᵐ)` of Theorem 4.7 could not achieve, its
+threshold there being `δₘ^(3-θ) ≪ δₘ`.  This is why the 4.7 event carries only the `σ̃`
+clause: on 4.7's schedule the margin is too small to keep `det U ≠ 0`, and the paper's 4.7
+accordingly claims definedness of the cleared form only.
 
 
-Theorem 4.9 assumes `f` is `C²` near `0`, and that is what these theorems assume:
-`ContDiffOn ℝ 2 f (Metric.ball 0 R)` together with `f 0 = 0`.  There is no polynomial
-hypothesis anywhere.  (Both the paper and this statement originally said `C³`; the proof
-needs `Df` Lipschitz at `0` and nothing more, so both were weakened to `C²`.)
+Theorems 4.7 and 4.9 assume `f` is `C²` near `0`: `ContDiffOn ℝ 2 f (Metric.ball 0 R)`
+together with `f 0 = 0`.  There is no polynomial hypothesis anywhere.  (Both the paper and
+this statement originally said `C³` for 4.9; the proof needs `Df` Lipschitz at `0` and
+nothing more, so both were weakened to `C²`.)  Theorem 5.5 is the exception: the paper
+states it for `C³`, and `mpe_undithered` assumes `ContDiffOn ℝ 3` to match.
 
 One hypothesis is *not* part of "`f` is `C²` near `0`", and is flagged rather than buried:
 `Measurable f`.  The dithered process is defined by the **global** map `f`, and a
@@ -58,19 +79,41 @@ it.  Nothing else about `f` outside the ball is used.
 
 ## What `mpe_dithered` says (Theorem 4.7)
 
-Let `f` be `C²` near `0` on `ℝⁿ` (`n = M+2`) with `f 0 = 0`, let `A = Df(0)`, assume `A - I`
-is invertible and `A` nonderogatory.  Run *minimal polynomial extrapolation with dithered
-restarts*: from `xₖ`, dither to `yₖ = xₖ + δₖ ξₖ` with `ξₖ` uniform on the cube `[-1,1]ⁿ`,
-and let `xₖ₊₁ = S yₖ` be the MPE extrapolant, in cleared form.  With the doubly-exponential
-schedule `δₖ = δ^(θᵏ)`, `θ ∈ (1,2)`,
+Let `f` be `C²` near `0` on `ℝⁿ` (`n = M+2`) with `f 0 = 0`, let `A = Df(0)`, and assume
+`A - I` is invertible.  That is the *entire* spectral hypothesis.  Let `k = deg m_A` be the
+degree of the minimal polynomial of `A` — the paper's window; `k = n` exactly when `A` is
+nonderogatory, and `k < n` otherwise.  At a general window `U(y)` is the `n × k` matrix with
+columns `u_j`, the normal matrix is `Γ = UᵀU`, and Cramer's rule on `Γ c = b`,
+`b = -Uᵀ u_k`, gives the cleared coefficients
 
-    P[ ∃ k, ‖xₖ‖ > δₖ ]  ≤  C · δ^((2-θ)/n)
+    c̃_j = det(Γ with column j replaced by b)  (j < k),      c̃_k = det Γ,
 
-for all small `δ`, from *every* starting point with `‖x₀‖ ≤ δ`.  Under the stronger
-hypothesis that `A` has `n` distinct eigenvalues, `mpe_quadratic` improves this to exponent
-`1` (with logarithms) on a genuinely quadratic schedule.
+equivalently `c̃ = adj(Γ)b`, the paper's display; and `Ñ = ∑_{j≤k} c̃_j f^j`,
+`σ̃ = ∑_{j≤k} c̃_j` — the paper's `σ̃ = D + ∑_{j<k} c̃_j` and `Ñ = ∑_{j<k} c̃_j f^j + D f^k`,
+since `c̃_k = D = det Γ`.  Each cycle dithers to
+`y_m = x_m + δ_m ξ_m`, `ξ_m` uniform on the cube `[-1,1]ⁿ`, and extrapolates to
+`x_{m+1} = S(y_m)`, `S = Ñ/σ̃`.  The conclusion covers both clauses of the paper's theorem —
+some cycle undefined (`σ̃(y_m) = 0`, where the junk value `0⁻¹ = 0` would otherwise let the
+process continue silently), or the schedule invariant breaking:
 
-## The MPE cycle, spelled out
+    P[ ∃ m, ‖x_m‖ > δ_m  or  σ̃(y_m) = 0 ]  ≤  C · δ^((2-θ)/(2k)),
+
+the exponent being `(2-θ)/d` for `d = deg Δ` and `Δ = det(KᵀK)` of degree `2k`.  On the
+complement, every cycle is defined and `‖x_m‖ ≤ δ_m` — the paper's conclusion verbatim.
+
+**Nothing is assumed about `Δ`.**  That `Δ ≢ 0` — the paper's Lemma 4.2(i) — is *derived*
+from `k = deg m_A` inside the proof, via the existence of a vector whose annihilator is the
+minimal polynomial (`MPE.exists_ann_eq_minpoly`).  Likewise `m_A(1) ≠ 0` and `k ≤ n` are
+derived, from `A - I` invertible and from `m_A ∣ χ_A`.
+
+Under the stronger hypothesis that `A` has `n` distinct eigenvalues, `mpe_quadratic`
+improves the exponent to `1` (with logarithms) on a genuinely quadratic schedule.
+
+## The MPE cycle at the full window, spelled out
+
+`mpe_quadratic` and `mpe_undithered` are full-window theorems — 4.9 assumes `n` distinct
+eigenvalues and 5.5 assumes `A` nonderogatory, so `k = n` in both — and there the paper
+takes the adjugate form of the parenthetical above.  Spelled out:
 
 `u_j(y) = f^{j+1}(y) - f^j(y)` for `j < n`; `U(y)` is the `n × n` matrix with those columns.
 Cramer's rule applied to the (generally singular) system `U c = -u_n`, `c_n = 1` gives the
@@ -94,59 +137,76 @@ open MeasureTheory
 -- The dimension is `n = M + 2`; writing it this way makes `n ≥ 2` true by construction.
 variable {M : ℕ}
 
-/-- **The paper's Theorem 4.7 (dithered restarts).**  `f` is `C²` near its fixed point, and
-the only spectral hypotheses are that `I - A` is invertible and that `A` is nonderogatory
-(`hnd`: some Krylov matrix of `A` is invertible).  There is no simple-spectrum assumption
-and no logarithm in the bound.  From *every* starting point with `‖x₀‖ ≤ δ` — it may be
-adversarial, and may lie on the breakdown set — the dithered process with the schedule
-`δₖ = δ^(θᵏ)` satisfies `‖xₖ‖ ≤ δₖ` for all `k` with probability at least
-`1 - Cst·δ^((2-θ)/n)`. -/
+/-- **The paper's Theorem 4.7.**  `f` is `C²` near its fixed point `0` and measurable
+elsewhere; `A = Df(0)`; `I - A` is invertible.  That is every spectral hypothesis — `A` may
+be **derogatory**.  The window is the paper's, `k = deg m_A` (`hk`, with `k` written `kk+1`
+so that `k ≥ 1` holds by construction).
+
+From *every* starting point with `‖x₀‖ ≤ δ` — it may be adversarial, and may lie on the
+breakdown set — with probability at least `1 - Cst·δ^((2-θ)/(2k))` over the dither, **every
+cycle is defined** (`σ̃ ≠ 0` at every dithered point, so the division in `S = Ñ/σ̃` is
+genuine) **and** `‖x_m‖ ≤ δ_m` for all `m`.
+
+Nothing is assumed about the degeneracy form: the paper's Lemma 4.2(i) is derived from
+`hk` inside the proof. -/
 theorem mpe_dithered
     -- the iteration: `C²` near its fixed point `0`, and measurable elsewhere
     (f : (Fin (M + 2) → ℝ) → (Fin (M + 2) → ℝ))
     {R : ℝ} (hR : 0 < R) (hf0 : f 0 = 0) (hmeas : Measurable f)
     (hf : ContDiffOn ℝ 2 f (Metric.ball 0 R))
-    -- the linear part `A = Df(0)`, invertible at `1` and nonderogatory
+    -- the linear part `A = Df(0)`, invertible at `1`.  No other spectral hypothesis.
     (A : Matrix (Fin (M + 2)) (Fin (M + 2)) ℝ)
     (hAdef : A = LinearMap.toMatrix'
       (fderiv ℝ f 0 : (Fin (M + 2) → ℝ) →L[ℝ] (Fin (M + 2) → ℝ)).toLinearMap)
     (hA : IsUnit (A - 1))
-    (hnd : ∃ v : Fin (M + 2) → ℝ,
-      Matrix.det (Matrix.of fun i j : Fin (M + 2) => ((A ^ (j : ℕ)).mulVec v) i) ≠ 0)
-    -- the MPE matrix, the cleared coefficients, denominator and numerator
-    (U : (Fin (M + 2) → ℝ) → Matrix (Fin (M + 2)) (Fin (M + 2)) ℝ)
+    -- the window is the degree of the minimal polynomial
+    {kk : ℕ} (hk : kk + 1 = (minpoly ℝ A).natDegree)
+    -- the `n × k` matrix of increments, its normal matrix, and the right-hand side
+    (U : (Fin (M + 2) → ℝ) → Matrix (Fin (M + 2)) (Fin (kk + 1)) ℝ)
     (hU : ∀ y i j, U y i j = f^[(j : ℕ) + 1] y i - f^[(j : ℕ)] y i)
+    (Gm : (Fin (M + 2) → ℝ) → Matrix (Fin (kk + 1)) (Fin (kk + 1)) ℝ)
+    (hGm : ∀ y, Gm y = (U y).transpose * U y)
+    (b : (Fin (M + 2) → ℝ) → Fin (kk + 1) → ℝ)
+    (hb : ∀ y j, b y j
+      = -∑ l : Fin (M + 2), U y l j * (f^[kk + 2] y l - f^[kk + 1] y l))
+    -- the cleared coefficients, by Cramer's rule on `Γ c = b`
     (c : ℕ → (Fin (M + 2) → ℝ) → ℝ)
-    (hcAdj : ∀ (j : Fin (M + 2)) y,
-      c (j : ℕ) y = (U y).adjugate.mulVec (fun i => -(f^[M + 3] y i - f^[M + 2] y i)) j)
-    (hcDet : ∀ y, c (M + 2) y = (U y).det)
+    (hcCramer : ∀ (j : Fin (kk + 1)) y, c (j : ℕ) y = (Gm y).cramer (b y) j)
+    (hcDet : ∀ y, c (kk + 1) y = (Gm y).det)
+    -- the cleared denominator and numerator
     (sg : (Fin (M + 2) → ℝ) → ℝ) (Nt : (Fin (M + 2) → ℝ) → (Fin (M + 2) → ℝ))
-    (hsg : ∀ y, sg y = ∑ j ∈ Finset.range (M + 3), c j y)
-    (hNt : ∀ y, Nt y = ∑ j ∈ Finset.range (M + 3), c j y • f^[j] y)
+    (hsg : ∀ y, sg y = ∑ j ∈ Finset.range (kk + 2), c j y)
+    (hNt : ∀ y, Nt y = ∑ j ∈ Finset.range (kk + 2), c j y • f^[j] y)
     -- the dither schedule exponent
     {θ : ℝ} (hθ1 : 1 < θ) (hθ2 : θ < 2) :
     ∃ dstar Cst : ℝ, 0 < dstar ∧ 0 < Cst ∧
       ∀ δ : ℝ, 0 < δ → δ ≤ dstar →
       ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →
-      -- the dithered process: `x₀`, then `xₖ₊₁ = S (xₖ + δₖ · clamp ωₖ)`, `S = Ñ/σ̃`
+      -- the dithered process: `x₀`, then `x_{m+1} = S (x_m + δ_m · clamp ω_m)`, `S = Ñ/σ̃`
       ∀ x : ℕ → (ℕ → Fin (M + 2) → ℝ) → (Fin (M + 2) → ℝ),
         (∀ ω, x 0 ω = x₀) →
-        (∀ k ω, x (k + 1) ω
-          = (sg (x k ω + (δ ^ (θ ^ k)) • fun i => max (-1) (min 1 (ω k i))))⁻¹
-            • Nt (x k ω + (δ ^ (θ ^ k)) • fun i => max (-1) (min 1 (ω k i)))) →
-        -- the dither `ωₖ` is uniform on the cube `[-1,1]ⁿ`, independently in `k`
+        (∀ m ω, x (m + 1) ω
+          = (sg (x m ω + (δ ^ (θ ^ m)) • fun i => max (-1) (min 1 (ω m i))))⁻¹
+            • Nt (x m ω + (δ ^ (θ ^ m)) • fun i => max (-1) (min 1 (ω m i)))) →
+        -- the dither `ω_m` is uniform on the cube `[-1,1]ⁿ`, independently in `m`
         (Measure.infinitePi fun _ : ℕ =>
             Measure.pi fun _ : Fin (M + 2) =>
               ENNReal.ofReal (1 / 2) • volume.restrict (Set.Icc (-1 : ℝ) 1))
-            {ω | ∃ k, δ ^ (θ ^ k) < ‖x k ω‖}
-          ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / ((M : ℝ) + 2))) :=
-  mpe_dithered_C2_stmt f hR hf0 hmeas hf A hAdef hA hnd U hU c hcAdj hcDet sg Nt hsg hNt
-    hθ1 hθ2
+            -- the failure event: the schedule invariant breaks, *or* some cycle is
+            -- undefined (`σ̃ = 0` at the dithered point)
+            {ω | ∃ m, δ ^ (θ ^ m) < ‖x m ω‖
+                  ∨ sg (x m ω + (δ ^ (θ ^ m)) • fun i => max (-1) (min 1 (ω m i))) = 0}
+          ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / (2 * (kk : ℝ) + 2))) :=
+  Smooth.mpe_dithered_gram_stmt f hR hf0 hmeas hf A hAdef hA hk U hU Gm hGm b hb
+    c hcCramer hcDet sg Nt hsg hNt hθ1 hθ2
 
-/-- **The paper's Theorem 4.9 (quadratic order).**  Same setup as `mpe_dithered`, but under
-the stronger hypothesis that `A` has `n` distinct eigenvalues (`hsq`), and with the schedule
+/-- **The paper's Theorem 4.9 (quadratic order).**  Same iteration and dither as
+`mpe_dithered`, but under the stronger hypothesis that `A` has `n` distinct eigenvalues
+(`hsq`), at the full window `k = n` in the adjugate form, and with the schedule
 `δ₀ = δ`, `δₖ₊₁ = K δₖ²` — order exactly `2`.  The failure probability improves to
-`C δ (1 + log⁺(1/δ))^(n-1)`: exponent `1`, uniformly in `n` and in `θ`.
+`C δ (1 + log⁺(1/δ))^(n-1)`: exponent `1`, uniformly in `n` and in `θ`.  On the good event
+every cycle is defined in the cleared form (`σ̃ ≠ 0`) *and* the least-squares system is
+nonsingular (`det U ≠ 0`, so MPE and RRE agree at every cycle), and `‖xₖ‖ ≤ δₖ`.
 
 `K` is existentially quantified alongside `δ_*` and `C`, since the paper's `K = max(8C₁,1)`
 depends on the one-cycle constant `C₁`; the paper notes that any larger value also works. -/
@@ -182,9 +242,10 @@ theorem mpe_quadratic
             Measure.pi fun _ : Fin (M + 2) =>
               ENNReal.ofReal (1 / 2) • volume.restrict (Set.Icc (-1 : ℝ) 1))
             -- the failure event: the schedule invariant breaks, *or* the least-squares
-            -- system is singular at some cycle
+            -- system is singular, *or* some cycle is undefined in the cleared form
             {ω | ∃ k, dl k < ‖x k ω‖
-                  ∨ Matrix.det (U (x k ω + dl k • fun i => max (-1) (min 1 (ω k i)))) = 0}
+                  ∨ Matrix.det (U (x k ω + dl k • fun i => max (-1) (min 1 (ω k i)))) = 0
+                  ∨ sg (x k ω + dl k • fun i => max (-1) (min 1 (ω k i))) = 0}
           ≤ ENNReal.ofReal (Cst * δ * (1 + max 0 (-Real.log δ)) ^ (M + 1)) :=
   Nonempty.elim (nonempty_smoothData hR hf0 hmeas (hf.of_le (by norm_num))) fun D =>
     D.mpe_quadratic_C3_proof A hAdef hA hsq U hU c hcAdj hcDet sg Nt hsg hNt

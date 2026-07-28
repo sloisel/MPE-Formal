@@ -72,7 +72,8 @@ theorem theorem47_of_anticonc (C : CycleData (Fin (M + 2) → ℝ)) {ρ : ℝ}
       (∀ m, hSched C.M δ θ m ≤ 1) →
       ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →
         (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
-            {ω | ∃ m, ¬ ‖xProcG C x₀ (sched δ θ) m ω‖ ≤ sched δ θ m}
+            {ω | ∃ m, ¬ ‖xProcG C x₀ (sched δ θ) m ω‖ ≤ sched δ θ m
+                  ∨ C.sigt (yProcG C x₀ (sched δ θ) m ω) = 0}
           ≤ ∑' m : ℕ, ENNReal.ofReal
               (A * (hSched C.M δ θ m + sched δ θ m) ^ ((dQ : ℝ)⁻¹)) := by
   intro δ hδ hδ1 h2δρ h2δρ₁ hs1 x₀ hx₀
@@ -95,9 +96,18 @@ theorem theorem47_of_anticonc (C : CycleData (Fin (M + 2) → ℝ)) {ρ : ℝ}
   have hcycle : ∀ m ω, xProcG C x₀ (sched δ θ) (m + 1) ω
       = C.S (yProcG C x₀ (sched δ θ) m ω) :=
     fun m ω => xProcG_succ C x₀ (sched δ θ) m ω
-  exact dither_gen C (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
+  have hP : ∀ (m : ℕ) (ω : ℕ → Fin (M + 2) → ℝ),
+      (∀ j ≤ m, ω ∈ goodGen C (hSched C.M δ θ) (yProcG C x₀ (sched δ θ)) j) →
+        C.sigt (yProcG C x₀ (sched δ θ) m ω) ≠ 0 := fun m ω h =>
+    (C.pos_of_τ_pos (lt_of_lt_of_le (hs0 m) (h m (le_refl m)))).2
+  have := dither_gen_full C (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
     (xProcG C x₀ (sched δ θ)) (yProcG C x₀ (sched δ θ)) _
-    (fun _ => hx₀d) hcycle hdither hstep hs0 hpsi
+    (fun z => C.sigt z ≠ 0)
+    (fun _ => hx₀d) hcycle hdither hstep hs0 hP hpsi
+  refine le_trans (le_of_eq ?_) this
+  congr 1
+  ext ω
+  simp only [Set.mem_setOf_eq, not_not]
 
 /-! ### Summing the series
 
@@ -121,7 +131,8 @@ theorem theorem47 (C : CycleData (Fin (M + 2) → ℝ)) {ρ : ℝ}
         ((δ ^ ((2 - θ) / dQ)) ^ (θ - 1) ≤ 1 / 2) →
       ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →
         (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
-            {ω | ∃ m, ¬ ‖xProcG C x₀ (sched δ θ) m ω‖ ≤ sched δ θ m}
+            {ω | ∃ m, ¬ ‖xProcG C x₀ (sched δ θ) m ω‖ ≤ sched δ θ m
+                  ∨ C.sigt (yProcG C x₀ (sched δ θ) m ω) = 0}
           ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / dQ)) := by
   have hM1 := C.hM
   have hM0 : (0:ℝ) < C.M := lt_of_lt_of_le one_pos hM1

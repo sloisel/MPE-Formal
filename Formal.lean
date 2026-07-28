@@ -1,5 +1,6 @@
 import Formal.Schedule
 import Formal.Smooth
+import Formal.VanGen
 import Formal.Weight
 import Formal.OneDim
 import Formal.Dyadic
@@ -32,10 +33,17 @@ import Formal.Quad
 import Formal.Corollary
 import Formal.Sublevel
 import Formal.KrylovSub
+import Formal.MaxVector
+import Formal.GramSub
+import Formal.GramAnti
+import Formal.Gram
 import Formal.SevenAnti
 import Formal.SevenCA
+import Formal.GramCA
+import Formal.GramSeven
 import Formal.Seven
 import Formal.SevenFull
+import Formal.GramFull
 import Formal.Cubic
 import Formal.Excluded
 import Formal.Percycle

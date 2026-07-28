@@ -1,12 +1,12 @@
 # MPE-Formal
 
 Lean 4 formalisation accompanying the paper *Local convergence of MPE and RRE*
-(S. Loisel).  The three main theorems of the paper are proved here, sorry-free and
+(S. Loisel).  The main theorems of the paper are proved here, sorry-free and
 depending only on Lean's standard axioms:
 
 | paper | Lean |
 | --- | --- |
-| Theorem 4.7 — dithered restarts, `C²`, no spectral hypothesis beyond `1 ∉ spec(A)` | `MPE.mpe_dithered` |
+| Theorem 4.7 — dithered restarts, `C²`, no spectral hypothesis beyond `1 ∉ spec(A)`, window `k = deg m_A` (`A` may be derogatory) | `MPE.mpe_dithered` |
 | Theorem 4.9 — quadratic order under simple spectrum | `MPE.mpe_quadratic` |
 | Theorem 5.5 — the undithered algorithm | `MPE.mpe_undithered` |
 

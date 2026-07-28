@@ -35,7 +35,9 @@ theorem theorem47_poly (hq : ∀ i, LowDeg 2 (q i)) (hA : IsUnit (A - 1))
         ((δ ^ ((2 - θ) / ((M : ℝ) + 2))) ^ (θ - 1) ≤ 1 / 2) →
       ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →
         (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
-            {ω | ∃ m, ¬ ‖xProcG (cycleData hq hA) x₀ (sched δ θ) m ω‖ ≤ sched δ θ m}
+            {ω | ∃ m, ¬ ‖xProcG (cycleData hq hA) x₀ (sched δ θ) m ω‖ ≤ sched δ θ m
+                  ∨ (cycleData hq hA).sigt
+                      (yProcG (cycleData hq hA) x₀ (sched δ θ) m ω) = 0}
           ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / ((M : ℝ) + 2))) := by
   classical
   obtain ⟨Am, hAm0, hAm⟩ := hCA_seven hq hA hnd
@@ -101,7 +103,8 @@ theorem theorem47_C2 (D : SmoothData f) (hA : IsUnit (Amat f - 1))
         ((δ ^ ((2 - θ) / ((M : ℝ) + 2))) ^ (θ - 1) ≤ 1 / 2) →
         ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →
           (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
-              {ω | ∃ k, ¬ ‖xProcG C x₀ (sched δ θ) k ω‖ ≤ sched δ θ k}
+              {ω | ∃ k, ¬ ‖xProcG C x₀ (sched δ θ) k ω‖ ≤ sched δ θ k
+                    ∨ C.sigt (yProcG C x₀ (sched δ θ) k ω) = 0}
             ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / ((M : ℝ) + 2))) := by
   classical
   obtain ⟨C, hd, hNt, hsigC, hρ₁, -⟩ :=
@@ -159,11 +162,17 @@ theorem theorem47_C2 (D : SmoothData f) (hA : IsUnit (Amat f - 1))
 `theorem47_C2` phrased with the smoothness hypothesis as the paper writes it: `f` is `C²`
 on a ball around its fixed point.  Everything else is unchanged. -/
 
-/-- **Theorem 4.7.**  Let `f` be `C²` near the fixed point `0`, with `I - A` invertible and
+/-- **Theorem 4.7's full-window parenthetical.**  The paper's Theorem 4.7 at the window
+`k = deg m_A` is `Statement.mpe_dithered`; this is the variant its parenthetical allows when
+`A` is nonderogatory (`hnd`) — `k = n`, `U` square, the adjugate form of the cleared
+coefficients, and the smaller degeneracy form `Δ = det K` of degree `n`, hence the better
+exponent `(2-θ)/n`.  It is proved independently, not derived from the general theorem.
+
+Let `f` be `C²` near the fixed point `0`, with `I - A` invertible and
 `A` nonderogatory, where `A = Df(0)`.  Fix a schedule exponent `θ ∈ (1,2)`.  Then for every
 small `δ` and *every* starting point with `‖x₀‖ ≤ δ` — the starting point may be chosen
 adversarially, and may lie on the breakdown set — dithered restarted MPE with the schedule
-`δ_m = δ^(θ^m)` satisfies, with probability at least `1 - C δ^((2-θ)/d)` over the dither:
+`δ_m = δ^(θ^m)` satisfies, with probability at least `1 - C δ^((2-θ)/n)` over the dither:
 every cycle is defined and `‖x_m‖ ≤ δ_m` for all `m`. -/
 theorem mpe_dithered_C2
     -- the iteration: `C²` near its fixed point `0`, and measurable elsewhere
@@ -184,14 +193,18 @@ theorem mpe_dithered_C2
         ((δ ^ ((2 - θ) / ((M : ℝ) + 2))) ^ (θ - 1) ≤ 1 / 2) →
         ∀ x₀ : Fin (M + 2) → ℝ, ‖x₀‖ ≤ δ →
           (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
-              {ω | ∃ k, ¬ ‖xProcG C x₀ (sched δ θ) k ω‖ ≤ sched δ θ k}
+              {ω | ∃ k, ¬ ‖xProcG C x₀ (sched δ θ) k ω‖ ≤ sched δ θ k
+                    ∨ C.sigt (yProcG C x₀ (sched δ θ) k ω) = 0}
             ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / ((M : ℝ) + 2))) := by
   obtain ⟨D⟩ := nonempty_smoothData hR hf0 hmeas hf
   subst hAdef
   exact theorem47_C2 D hA hnd hθ1 hθ2
 
-/-- **Theorem 4.7, with every object given by a defining equation.**  The bridging lemma
-behind `Formal/Statement.lean`'s self-contained statement: `U`, `c`, `σ̃`, `Ñ` are supplied
+/-- **The full-window parenthetical, with every object given by a defining equation.**
+Self-contained like the statements of `Formal/Statement.lean`, but no longer restated
+there — that file carries one Lean theorem per paper theorem, and this is the sharper
+`k = n` variant of `Statement.mpe_dithered`, not a paper theorem of its own.  `U`, `c`,
+`σ̃`, `Ñ` are supplied
 as data satisfying their paper definitions, the dithered process by its two recursions, and
 all smallness conditions are collapsed into a single `δ ≤ δ_*`. -/
 theorem mpe_dithered_C2_stmt
@@ -225,7 +238,8 @@ theorem mpe_dithered_C2_stmt
         (Measure.infinitePi fun _ : ℕ =>
             Measure.pi fun _ : Fin (M + 2) =>
               ENNReal.ofReal (1 / 2) • volume.restrict (Set.Icc (-1 : ℝ) 1))
-            {ω | ∃ k, δ ^ (θ ^ k) < ‖x k ω‖}
+            {ω | ∃ k, δ ^ (θ ^ k) < ‖x k ω‖
+                  ∨ sg (x k ω + (δ ^ (θ ^ k)) • fun i => max (-1) (min 1 (ω k i))) = 0}
           ≤ ENNReal.ofReal (Cst * δ ^ ((2 - θ) / ((M : ℝ) + 2))) := by
   classical
   obtain ⟨D⟩ := nonempty_smoothData hR hf0 hmeas hf
@@ -298,10 +312,18 @@ theorem mpe_dithered_C2_stmt
         show _ = (C.sigt _)⁻¹ • C.Ntil _
         rw [hsigC, hNtC]
         rfl
-  have hset : {ω : ℕ → Fin (M + 2) → ℝ | ∃ k, δ ^ (θ ^ k) < ‖x k ω‖}
-      = {ω | ∃ k, ¬ ‖xProcG C x₀ (sched δ θ) k ω‖ ≤ sched δ θ k} := by
+  have hyeq : ∀ k (ω : ℕ → Fin (M + 2) → ℝ),
+      sg (xProcG C x₀ (sched δ θ) k ω + (δ ^ (θ ^ k)) • fun i => max (-1) (min 1 (ω k i)))
+        = C.sigt (yProcG C x₀ (sched δ θ) k ω) := by
+    intro k ω
+    rw [hsgeq, hsigC]
+    rfl
+  have hset : {ω : ℕ → Fin (M + 2) → ℝ | ∃ k, δ ^ (θ ^ k) < ‖x k ω‖
+        ∨ sg (x k ω + (δ ^ (θ ^ k)) • fun i => max (-1) (min 1 (ω k i))) = 0}
+      = {ω | ∃ k, ¬ ‖xProcG C x₀ (sched δ θ) k ω‖ ≤ sched δ θ k
+        ∨ C.sigt (yProcG C x₀ (sched δ θ) k ω) = 0} := by
     ext ω
-    simp only [Set.mem_setOf_eq, sched, not_le, hxeq]
+    simp only [Set.mem_setOf_eq, sched, not_le, hxeq, hyeq]
   rw [hset]
   exact hmain δ hδ hδ1 hδρ hsch hratio x₀ hx₀
 

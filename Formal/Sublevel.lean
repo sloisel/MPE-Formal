@@ -596,6 +596,132 @@ lemma detPencil_coeff (B₀ B₁ : Matrix (Fin n) (Fin n) ℝ) :
   refine Finset.prod_congr rfl fun i _ => ?_
   simp [Polynomial.coeff_add, Polynomial.coeff_C]
 
+/-! ### Determinants of matrices of polynomials
+
+`detPencil` above is the case `p = 1` of the following: if every entry of a `k × k` matrix
+of polynomials has degree at most `p`, the determinant has degree at most `kp` and its
+coefficient in degree `kp` is the determinant of the matrix of top coefficients.  The
+general window needs `p = 2`, because there the degeneracy form is `det(KᵀK)` and the
+entries of the Gram matrix are quadratic along a line. -/
+
+section PolyDet
+
+variable {k p : ℕ}
+
+lemma natDegree_det_le (M : Matrix (Fin k) (Fin k) (Polynomial ℝ))
+    (h : ∀ i j, (M i j).natDegree ≤ p) : (Matrix.det M).natDegree ≤ k * p := by
+  classical
+  rw [Matrix.det_apply]
+  refine Polynomial.natDegree_sum_le_of_forall_le _ _ fun σ _ => ?_
+  refine le_trans (Polynomial.natDegree_smul_le _ _) ?_
+  refine le_trans (Polynomial.natDegree_prod_le _ _) ?_
+  calc ∑ i : Fin k, (M (σ i) i).natDegree ≤ ∑ _i : Fin k, p :=
+        Finset.sum_le_sum fun i _ => h (σ i) i
+    _ = k * p := by simp [mul_comm]
+
+lemma coeff_det_top (M : Matrix (Fin k) (Fin k) (Polynomial ℝ))
+    (h : ∀ i j, (M i j).natDegree ≤ p) :
+    (Matrix.det M).coeff (k * p) = Matrix.det (fun i j => (M i j).coeff p) := by
+  classical
+  rw [Matrix.det_apply, Polynomial.finsetSum_coeff, Matrix.det_apply]
+  refine Finset.sum_congr rfl fun σ _ => ?_
+  rw [Polynomial.coeff_smul]
+  congr 1
+  have hc := Polynomial.coeff_prod_of_natDegree_le (Finset.univ : Finset (Fin k))
+    (fun i : Fin k => M (σ i) i) p (fun i _ => h (σ i) i)
+  rwa [Finset.card_univ, Fintype.card_fin] at hc
+
+end PolyDet
+
+/-! ### The Gram pencil
+
+For a rectangular pencil `B₀ + t B₁` the degeneracy form of the general window is
+`det((B₀+tB₁)ᵀ(B₀+tB₁))`.  Each Gram entry is a sum of products of two affine polynomials,
+hence quadratic, with `t²`-coefficient the corresponding entry of `B₁ᵀB₁`; so the
+determinant has degree `2k` and top coefficient `det(B₁ᵀB₁)`. -/
+
+section GramPencil
+
+open Matrix
+
+variable {n k : ℕ}
+
+/-- The Gram matrix of the pencil `B₀ + t B₁`, entrywise as polynomials in `t`. -/
+noncomputable def gramPencil (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) :
+    Matrix (Fin k) (Fin k) (Polynomial ℝ) :=
+  fun i j => ∑ l : Fin n,
+    (Polynomial.C (B₀ l i) + Polynomial.C (B₁ l i) * Polynomial.X) *
+    (Polynomial.C (B₀ l j) + Polynomial.C (B₁ l j) * Polynomial.X)
+
+lemma gramPencil_eval (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) (t : ℝ) (i j : Fin k) :
+    (gramPencil B₀ B₁ i j).eval t = ((B₀ + t • B₁)ᵀ * (B₀ + t • B₁)) i j := by
+  rw [gramPencil, Matrix.mul_apply]
+  rw [Polynomial.eval_finset_sum]
+  refine Finset.sum_congr rfl fun l _ => ?_
+  simp only [Polynomial.eval_mul, Polynomial.eval_add, Polynomial.eval_C, Polynomial.eval_X,
+    Matrix.transpose_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
+  ring
+
+lemma gramPencil_natDegree_le (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) (i j : Fin k) :
+    (gramPencil B₀ B₁ i j).natDegree ≤ 2 := by
+  rw [gramPencil]
+  refine Polynomial.natDegree_sum_le_of_forall_le _ _ fun l _ => ?_
+  have haff : ∀ a b : ℝ,
+      (Polynomial.C a + Polynomial.C b * Polynomial.X).natDegree ≤ 1 := by
+    intro a b
+    refine le_trans (Polynomial.natDegree_add_le _ _) ?_
+    simp only [Polynomial.natDegree_C, max_le_iff]
+    exact ⟨Nat.zero_le _, le_trans (Polynomial.natDegree_C_mul_le _ _) (by simp)⟩
+  refine le_trans (Polynomial.natDegree_mul_le) ?_
+  have := haff (B₀ l i) (B₁ l i)
+  have := haff (B₀ l j) (B₁ l j)
+  omega
+
+lemma gramPencil_coeff (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) (i j : Fin k) :
+    (gramPencil B₀ B₁ i j).coeff 2 = (B₁ᵀ * B₁) i j := by
+  rw [gramPencil, Polynomial.finsetSum_coeff, Matrix.mul_apply]
+  refine Finset.sum_congr rfl fun l _ => ?_
+  have hexp : (Polynomial.C (B₀ l i) + Polynomial.C (B₁ l i) * Polynomial.X) *
+      (Polynomial.C (B₀ l j) + Polynomial.C (B₁ l j) * Polynomial.X)
+      = Polynomial.C (B₀ l i * B₀ l j)
+        + Polynomial.C (B₀ l i * B₁ l j + B₁ l i * B₀ l j) * Polynomial.X
+        + Polynomial.C (B₁ l i * B₁ l j) * Polynomial.X ^ 2 := by
+    push_cast [Polynomial.C_mul, Polynomial.C_add]
+    ring
+  rw [hexp, Polynomial.coeff_add, Polynomial.coeff_add, Polynomial.coeff_C_mul,
+    Polynomial.coeff_C_mul, Polynomial.coeff_C, Polynomial.coeff_X_pow,
+    Polynomial.coeff_X, Matrix.transpose_apply]
+  norm_num
+
+/-- **The Gram pencil determinant.**  Degree at most `2k`, with `t^{2k}`-coefficient
+`det(B₁ᵀB₁)`. -/
+noncomputable def detGramPencil (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) : Polynomial ℝ :=
+  Matrix.det (gramPencil B₀ B₁)
+
+lemma detGramPencil_eval (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) (t : ℝ) :
+    (detGramPencil B₀ B₁).eval t
+      = Matrix.det ((B₀ + t • B₁)ᵀ * (B₀ + t • B₁)) := by
+  rw [detGramPencil, ← Polynomial.coe_evalRingHom, RingHom.map_det]
+  congr 1
+  ext i j
+  simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Polynomial.coe_evalRingHom]
+  exact gramPencil_eval B₀ B₁ t i j
+
+lemma detGramPencil_natDegree_le (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) :
+    (detGramPencil B₀ B₁).natDegree ≤ 2 * k := by
+  rw [detGramPencil, mul_comm]
+  exact natDegree_det_le _ (fun i j => gramPencil_natDegree_le B₀ B₁ i j)
+
+lemma detGramPencil_coeff (B₀ B₁ : Matrix (Fin n) (Fin k) ℝ) :
+    (detGramPencil B₀ B₁).coeff (2 * k) = Matrix.det (B₁ᵀ * B₁) := by
+  rw [detGramPencil, mul_comm]
+  rw [coeff_det_top _ (fun i j => gramPencil_natDegree_le B₀ B₁ i j)]
+  congr 1
+  ext i j
+  exact gramPencil_coeff B₀ B₁ i j
+
+end GramPencil
+
 end Pencil
 
 /-! ### Fibring: from one variable to `n`

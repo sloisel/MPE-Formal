@@ -1518,7 +1518,8 @@ theorem corollary_C3 (hA : IsUnit (Amat f - 1)) (hsq : Squarefree (Amat f).charp
           (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
               {ω | ∃ k, ¬ ‖xProcG C x₀ (qsched (max (8 * B.C₁) 1) δ) k ω‖
                     ≤ qsched (max (8 * B.C₁) 1) δ k
-                  ∨ cct f (M + 2) (yProcG C x₀ (qsched (max (8 * B.C₁) 1) δ) k ω) = 0}
+                  ∨ cct f (M + 2) (yProcG C x₀ (qsched (max (8 * B.C₁) 1) δ) k ω) = 0
+                  ∨ sigt f (yProcG C x₀ (qsched (max (8 * B.C₁) 1) δ) k ω) = 0}
             ≤ ENNReal.ofReal (Cst * δ * Lam δ ^ (M + 1)) := by
   classical
   obtain ⟨C, hd, hNt, hsigC, hρ₁, ⟨B⟩⟩ :=
@@ -1587,13 +1588,18 @@ theorem corollary_C3 (hA : IsUnit (Amat f - 1)) (hsq : Squarefree (Amat f).charp
     (Rm := fun y => sigt f y - Rmf y) hρ0 Dsh C hd (fun y => by rw [hsigC]) hz hSmeas hτmeas
     hlead (fun y => by rw [hRmfdef]; ring) hRmeas
     (by positivity : (0:ℝ) ≤ cRm * NL ^ (M + 3)) hRderiv B hcth0 hcthge
-    (fun z => cct f (M + 2) z ≠ 0) hDne
+    (fun z => cct f (M + 2) z ≠ 0 ∧ sigt f z ≠ 0)
+    (fun z hz0 hzρ hτ => ⟨hDne z hz0 hzρ hτ, by
+      have hτ0 : 0 < C.τ z := lt_of_lt_of_le (by positivity) hτ
+      have h2 := (C.pos_of_τ_pos hτ0).2
+      rwa [hsigC] at h2⟩)
   refine ⟨C, B, Cst, ρ, cth, hNt, hsigC, hCst, hρ0, hcth0, hDne, ?_⟩
   intro δ hδ hδ1 h1 h2 h3 h4 x₀ hx₀
   refine le_trans (measure_mono ?_) (hmain δ hδ hδ1 h1 h2 h3 h4 x₀ hx₀)
-  rintro ω ⟨k, hk | hk⟩
+  rintro ω ⟨k, hk | hk | hk⟩
   · exact ⟨k, Or.inl hk⟩
-  · exact ⟨k, Or.inr (by simpa using hk)⟩
+  · exact ⟨k, Or.inr fun hP => hP.1 (by simpa using hk)⟩
+  · exact ⟨k, Or.inr fun hP => hP.2 hk⟩
 
 include D in
 /-- **Theorem 4.9 for a `C³` iteration, with the smallness conditions collapsed to
@@ -1612,7 +1618,8 @@ theorem corollary_small_C3 (hA : IsUnit (Amat f - 1))
               • Ntil f (x k ω + (dl k) • clamp (ω k))) →
           (Measure.infinitePi (fun _ : ℕ => blockMeasure (M + 2)))
               {ω | ∃ k, ¬ ‖x k ω‖ ≤ dl k
-                    ∨ Matrix.det (fun i j => Umat f i j (x k ω + dl k • clamp (ω k))) = 0}
+                    ∨ Matrix.det (fun i j => Umat f i j (x k ω + dl k • clamp (ω k))) = 0
+                    ∨ sigt f (x k ω + dl k • clamp (ω k)) = 0}
             ≤ ENNReal.ofReal (Cst * δ * Lam δ ^ (M + 1)) := by
   classical
   obtain ⟨C, B, Cst, ρ, cth, hNt, hsigC, hCst, hρ0, hcth0, hDne, hmain⟩ :=
@@ -1668,10 +1675,13 @@ theorem corollary_small_C3 (hA : IsUnit (Amat f - 1))
     rw [hxeq k ω, hdleq k, yProcG]
   refine le_trans (measure_mono ?_)
     (hmain δ hδ hδ1 hcond1 hcond2 (by linarith) (by linarith) x₀ hx₀)
-  rintro ω ⟨k, hk | hk⟩
+  rintro ω ⟨k, hk | hk | hk⟩
   · exact ⟨k, Or.inl (by rw [← hxeq k ω, ← hdleq k]; exact hk)⟩
-  · refine ⟨k, Or.inr ?_⟩
+  · refine ⟨k, Or.inr (Or.inl ?_)⟩
     rw [cct_top, ← hyeq k ω]
+    exact hk
+  · refine ⟨k, Or.inr (Or.inr ?_)⟩
+    rw [← hyeq k ω]
     exact hk
 
 include D in
@@ -1704,7 +1714,8 @@ theorem mpe_quadratic_C3_proof
             Measure.pi fun _ : Fin (M + 2) =>
               ENNReal.ofReal (1 / 2) • volume.restrict (Set.Icc (-1 : ℝ) 1))
             {ω | ∃ k, dl k < ‖x k ω‖
-                  ∨ Matrix.det (U (x k ω + dl k • fun i => max (-1) (min 1 (ω k i)))) = 0}
+                  ∨ Matrix.det (U (x k ω + dl k • fun i => max (-1) (min 1 (ω k i)))) = 0
+                  ∨ sg (x k ω + dl k • fun i => max (-1) (min 1 (ω k i))) = 0}
           ≤ ENNReal.ofReal (Cst * δ * (1 + max 0 (-Real.log δ)) ^ (M + 1)) := by
   classical
   -- identify the data with the construction of this file
@@ -1738,18 +1749,22 @@ theorem mpe_quadratic_C3_proof
   refine ⟨K, dstar, Cst, hK1, hd0, hC0, ?_⟩
   intro δ hδ hδt x₀ hx₀ dl hdl0 hdls x hx0 hxs
   have hset : {ω : ℕ → Fin (M + 2) → ℝ | ∃ k, dl k < ‖x k ω‖
-        ∨ Matrix.det (U (x k ω + dl k • fun i => max (-1) (min 1 (ω k i)))) = 0}
+        ∨ Matrix.det (U (x k ω + dl k • fun i => max (-1) (min 1 (ω k i)))) = 0
+        ∨ sg (x k ω + dl k • fun i => max (-1) (min 1 (ω k i))) = 0}
       = {ω | ∃ k, ¬ ‖x k ω‖ ≤ dl k
-          ∨ Matrix.det (fun i j => Umat f i j (x k ω + dl k • clamp (ω k))) = 0} := by
+          ∨ Matrix.det (fun i j => Umat f i j (x k ω + dl k • clamp (ω k))) = 0
+          ∨ sigt f (x k ω + dl k • clamp (ω k)) = 0} := by
     ext ω
     simp only [Set.mem_setOf_eq, not_le]
     constructor
-    · rintro ⟨k, hk | hk⟩
+    · rintro ⟨k, hk | hk | hk⟩
       · exact ⟨k, Or.inl hk⟩
-      · exact ⟨k, Or.inr (by rw [Umat_eval, ← hUeq]; exact hk)⟩
-    · rintro ⟨k, hk | hk⟩
+      · exact ⟨k, Or.inr (Or.inl (by rw [Umat_eval, ← hUeq]; exact hk))⟩
+      · exact ⟨k, Or.inr (Or.inr (by rw [hsgeq] at hk; exact hk))⟩
+    · rintro ⟨k, hk | hk | hk⟩
       · exact ⟨k, Or.inl hk⟩
-      · exact ⟨k, Or.inr (by rw [Umat_eval, ← hUeq] at hk; exact hk)⟩
+      · exact ⟨k, Or.inr (Or.inl (by rw [Umat_eval, ← hUeq] at hk; exact hk))⟩
+      · exact ⟨k, Or.inr (Or.inr (by rw [hsgeq]; exact hk))⟩
   rw [hset]
   refine hmain δ hδ hδt x₀ hx₀ dl hdl0 hdls x hx0 ?_
   intro k ω
