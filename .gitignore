@@ -1,0 +1,14 @@
+# Lake stores all build output and fetched dependencies here, including
+# mathlib itself (several GB).  Everything under it is reconstructible from
+# lake-manifest.json and lean-toolchain via `lake exe cache get`.
+/.lake
+
+# Created by `lake exe cache get` when no home directory is available
+.cache
+
+# macOS
+.DS_Store
+
+# stray TeX output
+*.log
+*.aux

@@ -1,0 +1,18 @@
+name = "formal"
+version = "0.1.0"
+defaultTargets = ["Formal"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+
+# Mathlib, pinned to the exact commit of tag v4.32.1, which matches lean-toolchain.
+# Lake fetches it into .lake/packages/ (gitignored); `lake exe cache get` then
+# downloads its prebuilt .olean files rather than compiling them.
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "520045ab14e26149ee970e2e617ca04b09bde5d6"
+
+[[lean_lib]]
+name = "Formal"
