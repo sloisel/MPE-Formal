@@ -29,22 +29,21 @@ jobs:
       # Installs the toolchain named in lean-toolchain, runs `lake exe cache get`
       # so mathlib's oleans are downloaded rather than rebuilt, then `lake build`.
       #
-      # `-j2`: every file here does `import Mathlib`, and a single such Lean
-      # process peaks near 6 GB resident.  The runner has 16 GB, so the default
-      # `-j4` risks the OOM killer.  Measured locally, the whole build is 291 s
-      # of CPU time, so two workers cost only a few minutes of wall clock.
+      # `lake build` is itself the audit: Formal/Statement.lean ends in a `run_cmd`
+      # that throws unless each of the three theorems is self-contained and rests on
+      # no axiom beyond propext/Classical.choice/Quot.sound.  That is what rules out
+      # `sorryAx` — a `sorry` is otherwise only a warning and would not fail a build.
+      #
+      # Deliberately no `build-args`.  `--wfail` would turn warnings into errors and
+      # so also catch a `sorry`, but this build emits ~105 linter warnings (unused
+      # variables, unused simp arguments), so it would fail on all of them; the
+      # `run_cmd` catches holes without requiring a warning-clean tree.  Lake has no
+      # `-j` in v4.32.1, so build parallelism is left at its default.
       - uses: leanprover/lean-action@v1
         with:
           use-mathlib-cache: true
-          build-args: "-j2"
 
-      # `lake build` above is already the audit: Formal/Statement.lean ends in a
-      # `run_cmd` that throws unless each of the three theorems is self-contained
-      # and rests on no axiom beyond propext/Classical.choice/Quot.sound — which
-      # is what rules out `sorryAx`, since a `sorry` is otherwise only a warning
-      # and would not fail the build.
-      #
-      # That covers everything the three theorems depend on.  This step adds the
+      # The `run_cmd` covers everything the three theorems depend on.  This adds the
       # rest of the tree, which nothing in Statement.lean reaches.
       - name: No sorries anywhere
         run: |
