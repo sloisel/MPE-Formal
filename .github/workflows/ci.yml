@@ -34,22 +34,13 @@ jobs:
       # no axiom beyond propext/Classical.choice/Quot.sound.  That is what rules out
       # `sorryAx` — a `sorry` is otherwise only a warning and would not fail a build.
       #
-      # Deliberately no `build-args`.  `--wfail` would turn warnings into errors and
-      # so also catch a `sorry`, but this build emits ~105 linter warnings (unused
-      # variables, unused simp arguments), so it would fail on all of them; the
-      # `run_cmd` catches holes without requiring a warning-clean tree.  Lake has no
-      # `-j` in v4.32.1, so build parallelism is left at its default.
+      # No `build-args` yet.  `--wfail` turns warnings into errors and so would also
+      # catch a `sorry`, which is the standard way to do this — but the tree currently
+      # emits 105 warnings (34 unused variables, 37 mathlib deprecations, 22 unused
+      # simp arguments, 7 dead tactics, plus a few section-variable ones), so adopting
+      # it is a cleanup first.  Until then a `sorry` is caught by the per-theorem axiom
+      # check in Formal/Statement.lean for everything the three theorems reach, and
+      # environment-wide by the weekly nanoda run in recheck.yml.
       - uses: leanprover/lean-action@v1
         with:
           use-mathlib-cache: true
-
-      # The `run_cmd` covers everything the three theorems depend on.  This adds the
-      # rest of the tree, which nothing in Statement.lean reaches.
-      - name: No sorries anywhere
-        run: |
-          if grep -rn --include='*.lean' -E '(^|[^a-zA-Z_])sorry([^a-zA-Z_]|$)' Formal/ \
-               | grep -v 'sorryAx'; then
-            echo "::error::a sorry is present"
-            exit 1
-          fi
-          echo "no sorries"
