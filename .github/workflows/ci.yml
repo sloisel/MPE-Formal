@@ -1,0 +1,56 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A newer push to the same branch cancels an in-flight run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The runner ships ~14 GB free; mathlib's oleans are ~6.4 GB and the
+      # toolchain ~2 GB, so reclaim preinstalled SDKs we do not use.
+      - name: Free disk space
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          df -h /
+
+      # Installs the toolchain named in lean-toolchain, runs `lake exe cache get`
+      # so mathlib's oleans are downloaded rather than rebuilt, then `lake build`.
+      #
+      # `-j2`: every file here does `import Mathlib`, and a single such Lean
+      # process peaks near 6 GB resident.  The runner has 16 GB, so the default
+      # `-j4` risks the OOM killer.  Measured locally, the whole build is 291 s
+      # of CPU time, so two workers cost only a few minutes of wall clock.
+      - uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build-args: "-j2"
+
+      # `lake build` above is already the audit: Formal/Statement.lean ends in a
+      # `run_cmd` that throws unless each of the three theorems is self-contained
+      # and rests on no axiom beyond propext/Classical.choice/Quot.sound — which
+      # is what rules out `sorryAx`, since a `sorry` is otherwise only a warning
+      # and would not fail the build.
+      #
+      # That covers everything the three theorems depend on.  This step adds the
+      # rest of the tree, which nothing in Statement.lean reaches.
+      - name: No sorries anywhere
+        run: |
+          if grep -rn --include='*.lean' -E '(^|[^a-zA-Z_])sorry([^a-zA-Z_]|$)' Formal/ \
+               | grep -v 'sorryAx'; then
+            echo "::error::a sorry is present"
+            exit 1
+          fi
+          echo "no sorries"

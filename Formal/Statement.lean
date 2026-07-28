@@ -315,11 +315,12 @@ theorem mpe_undithered
 
 /-! ### The mechanical checks
 
-These run on every `lake build`.  The first prints the axioms the theorem rests on; anything
-beyond `propext`, `Classical.choice`, `Quot.sound` — in particular `sorryAx` — would appear
-here.  The second **fails the build** if any definition of this development ever creeps into
-the statement, which is what makes the file's claim to be self-contained maintainable rather
-than a one-off. -/
+These run on every `lake build`, and both **fail the build** rather than merely reporting.
+That matters: a `sorry` is only a *warning* in Lean, so a build that merely compiles proves
+nothing.  The first check closes that hole by walking the actual axiom dependencies — the
+same information `#print axioms` prints, but asserted.  The second fails if any definition
+of this development ever creeps into a statement, which is what makes the file's claim to be
+self-contained maintainable rather than a one-off. -/
 
 #print axioms mpe_dithered
 #print axioms mpe_quadratic
@@ -327,10 +328,17 @@ than a one-off. -/
 
 open Lean in
 run_cmd do
+  let allowed : List Name := [``propext, ``Classical.choice, ``Quot.sound]
   for nm in [`MPE.mpe_dithered, `MPE.mpe_quadratic, `MPE.mpe_undithered] do
+    -- self-containedness: the statement mentions nothing from this development
     let info ← Lean.getConstInfo nm
     let mine := info.type.getUsedConstants.filter fun c => (`MPE).isPrefixOf c
     unless mine.isEmpty do
       throwError "the statement of {nm} is not self-contained: it mentions {mine}"
+    -- soundness: no axioms beyond Lean's three, and in particular no `sorryAx`
+    let used ← Lean.collectAxioms nm
+    let extra := used.filter fun a => !(allowed.contains a)
+    unless extra.isEmpty do
+      throwError "{nm} depends on unexpected axioms: {extra.toList}"
 
 end MPE

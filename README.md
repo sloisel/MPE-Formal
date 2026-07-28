@@ -1,5 +1,7 @@
 # MPE-Formal
 
+[![build](https://github.com/sloisel/MPE-Formal/actions/workflows/ci.yml/badge.svg)](https://github.com/sloisel/MPE-Formal/actions/workflows/ci.yml)
+
 Lean 4 formalisation accompanying the paper *Local convergence of MPE and RRE*
 (S. Loisel).  The main theorems of the paper are proved here, sorry-free and
 depending only on Lean's standard axioms:
@@ -13,7 +15,12 @@ depending only on Lean's standard axioms:
 All three are stated in `Formal/Statement.lean`, in a form that mentions **no definition
 from this development** — only mathlib notions — so that a reader who accepts mathlib can
 audit them without reading anything else.  A `run_cmd` at the bottom of that file fails the
-build if that ever stops being true, and `#print axioms` is run on each.
+build if that ever stops being true.  The same `run_cmd` also **fails the build** unless
+each theorem rests on nothing beyond `propext`, `Classical.choice` and `Quot.sound` — which
+is what rules out `sorryAx`.  That check is not decorative: in Lean a `sorry` is only a
+*warning*, so a project that merely compiles proves nothing.  CI runs exactly this
+`lake build`, plus a grep for sorries in the parts of the tree the three theorems do not
+reach.
 
 Some source files carry docstrings referring to `../../paper.tex`, `../../appendix.tex`
 and similar.  Those are the paper and its working notes, which live in a separate
