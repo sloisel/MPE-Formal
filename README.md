@@ -55,3 +55,8 @@ If `.lake` is ever deleted:  `lake resolve-deps` restores it in seconds.
 
 `propext`, `Classical.choice`, `Quot.sound` are Lean's standard foundations and are
 expected.  Anything else — especially `sorryAx` — means the proof has a hole.
+
+## License
+
+MIT (see `LICENSE`).  Mathlib, on which this development depends, is separately
+licensed under Apache 2.0; it is fetched by `lake`, not redistributed here.
