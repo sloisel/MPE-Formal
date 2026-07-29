@@ -44,3 +44,13 @@ jobs:
         with:
           use-mathlib-cache: true
           build-args: "--wfail"
+
+      # Deliberately not run here: `leanchecker`, which replays the compiled
+      # environment through the kernel.  It guards against declarations reaching
+      # the environment without full kernel checking — the `unsafe`,
+      # `implemented_by`, `native_decide` family — and this development uses none
+      # of them (nor any custom `axiom`, `opaque` or `extern`), so it would only be
+      # re-testing mathlib, which is pinned by commit and not what we are auditing.
+      # Bare `lake env leanchecker` also exceeds a standard runner's memory and is
+      # killed part-way; covering our own modules means one invocation per module,
+      # each reloading mathlib.  All cost, no signal, so it is left out.

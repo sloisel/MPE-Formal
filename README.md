@@ -18,9 +18,11 @@ audit them without reading anything else.  A `run_cmd` at the bottom of that fil
 build if that ever stops being true.  The same `run_cmd` also **fails the build** unless
 each theorem rests on nothing beyond `propext`, `Classical.choice` and `Quot.sound` — which
 is what rules out `sorryAx`.  That check is not decorative: in Lean a `sorry` is only a
-*warning*, so a project that merely compiles proves nothing.  CI runs exactly this
-`lake build`, plus a grep for sorries in the parts of the tree the three theorems do not
-reach.
+*warning*, so a project that merely compiles proves nothing.  CI is exactly this
+`lake build`, run on every push, with `--wfail` so that a stray `sorry` anywhere in the
+tree — even in a file the three theorems do not reach — fails the build as a warning
+turned error.  There is one workflow and it is synchronous: a green badge means the
+build, the axiom audit and the warning check all passed for that commit.
 
 Some source files carry docstrings referring to `../../paper.tex`, `../../appendix.tex`
 and similar.  Those are the paper and its working notes, which live in a separate
@@ -62,6 +64,16 @@ If `.lake` is ever deleted:  `lake resolve-deps` restores it in seconds.
 
 `propext`, `Classical.choice`, `Quot.sound` are Lean's standard foundations and are
 expected.  Anything else — especially `sorryAx` — means the proof has a hole.
+
+A reader wanting the strongest available check can replay a module's declarations
+through the kernel, which trusts neither the elaborator nor the environment it built:
+
+    lake env leanchecker Formal.Statement
+
+CI does not run this.  It defends against declarations entering the environment without
+full kernel checking, and this development contains no `unsafe`, `implemented_by`,
+`native_decide`, `opaque`, `extern` or custom `axiom` for it to catch; invoked with no
+argument it also tries to replay all of mathlib, which exhausts a standard runner.
 
 ## License
 
