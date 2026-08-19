@@ -54,6 +54,14 @@ jobs:
       # statements -- is a judgment call (the registry runs an LLM; here the
       # author reviews it before each submission) and is deliberately not in
       # CI, which stays deterministic.
+      # The free-disk step above deletes $AGENT_TOOLSDIRECTORY, which is where
+      # the runner's preinstalled Go lives; restore a Go for `go install` of
+      # landrun (needed only on a cold comparator cache).
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          cache: false
+
       - name: Cache the Comparator toolchain
         uses: actions/cache@v4
         with:
