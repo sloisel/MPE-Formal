@@ -16,7 +16,7 @@ project:
 sources:
   - title: "On the local convergence of minimal polynomial and reduced rank extrapolation for nonlinear fixed-point iterations"
     authors: ["Sébastien Loisel"]
-    id: ""
+    id: "Submitted manuscript, July 2026; no public identifier yet"
     type: "article"
     location: "Theorems 4.7, 4.9 and 5.5"
     relationship: "formalizes"
