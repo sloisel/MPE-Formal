@@ -5,16 +5,14 @@
 # the exported proof.  This is the same mechanical check the Palomar registry
 # runs at submission.
 #
-# Comparator publishes one tag per Lean release and has none for v4.32.2, so
-# its v4.32.0 source — same patch family — is built under our own toolchain;
-# lean4export has an exact v4.32.2 tag.  Olean files are only readable by the
-# exact compiler that wrote them, so both tools MUST be built with
-# ./lean-toolchain; the cache directory is keyed by the toolchain for the
-# same reason.
+# Both tools have exact tags for this toolchain (v4.32.0).  They are still
+# built under ./lean-toolchain — olean files are only readable by the exact
+# compiler that wrote them — and the cache directory is keyed by the
+# toolchain so a bump can never reuse stale binaries.
 set -euo pipefail
 
 COMPARATOR_TAG=v4.32.0
-LEAN4EXPORT_TAG=v4.32.2
+LEAN4EXPORT_TAG=v4.32.0
 TOOLCHAIN=$(cat lean-toolchain)
 CACHE="${COMPARATOR_CACHE:-$HOME/.cache/mpe-comparator}/${TOOLCHAIN//[:\/]/-}"
 mkdir -p "$CACHE/bin"

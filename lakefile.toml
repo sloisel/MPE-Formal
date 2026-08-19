@@ -6,13 +6,20 @@ defaultTargets = ["Formal", "Solution"]
 pp.unicode.fun = true
 relaxedAutoImplicit = false
 
-# Mathlib, pinned to the exact commit of tag v4.32.2, which matches lean-toolchain.
+# Mathlib, pinned to the last master commit on toolchain v4.32.0 (the parent of
+# master's v4.33.0-rc1 bump).  A master commit rather than a release tag: the
+# Palomar registry verifies that the pin is an ancestor of mathlib's canonical
+# master, and patch-release tags (v4.32.1, v4.32.2) are cut on release branches
+# that never merge back.  Because patch fixes are cherry-picked from master, this
+# commit's content is a superset of the v4.32.2 tag this repository previously
+# pinned; the v4.33 line is deliberately not taken (it carries a Matrix refactor
+# that breaks three modules here).
 # Lake fetches it into .lake/packages/ (gitignored); `lake exe cache get` then
 # downloads its prebuilt .olean files rather than compiling them.
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "905b95818eb32af7874a58b427f50c1711a5e96c"
+rev = "3dffaf2f18b47d11948f6390838ea6f2ae662aaf"
 
 [[lean_lib]]
 name = "Formal"
