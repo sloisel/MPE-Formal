@@ -45,13 +45,13 @@ repository; the references are historical pointers and nothing here depends on t
 Only the proof is versioned here — a few tens of KB of `.lean`, alongside the paper.
 Everything it depends on is *declared*, not stored:
 
-    lean-toolchain           the compiler version, `leanprover/lean4:v4.32.1`
+    lean-toolchain           the compiler version, `leanprover/lean4:v4.32.2`
     lakefile.toml            what we require: mathlib, pinned by commit
     lake-manifest.json       the exact commit of mathlib and its 8 transitive deps
 
 This is the standard Lean layout, and it is what makes the development reproducible: a
 reader clones the repo and runs the two commands under **Build** below.  Mathlib is
-pinned to `520045ab…`, the commit of tag `v4.32.1`, matching `lean-toolchain`.
+pinned to `905b9581…`, the commit of tag `v4.32.2`, matching `lean-toolchain`.
 
 `.lake/` holds the fetched packages and all build output — about 7.5 GB, of which 6.4 GB
 is mathlib's compiled `.olean` files.  It is derived, so it is gitignored.  It is also

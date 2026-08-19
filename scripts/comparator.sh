@@ -5,17 +5,18 @@
 # the exported proof.  This is the same mechanical check the Palomar registry
 # runs at submission.
 #
-# Comparator publishes one tag per Lean release and has none for the patch
-# release this repository pins (v4.32.1), so its v4.32.0 source — same patch
-# family — is built under our own toolchain; likewise lean4export (nearest
-# family tag v4.32.2).  Olean files are only readable by the exact compiler
-# that wrote them, so both tools MUST be built with ./lean-toolchain.
+# Comparator publishes one tag per Lean release and has none for v4.32.2, so
+# its v4.32.0 source — same patch family — is built under our own toolchain;
+# lean4export has an exact v4.32.2 tag.  Olean files are only readable by the
+# exact compiler that wrote them, so both tools MUST be built with
+# ./lean-toolchain; the cache directory is keyed by the toolchain for the
+# same reason.
 set -euo pipefail
 
 COMPARATOR_TAG=v4.32.0
 LEAN4EXPORT_TAG=v4.32.2
 TOOLCHAIN=$(cat lean-toolchain)
-CACHE="${COMPARATOR_CACHE:-$HOME/.cache/mpe-comparator}"
+CACHE="${COMPARATOR_CACHE:-$HOME/.cache/mpe-comparator}/${TOOLCHAIN//[:\/]/-}"
 mkdir -p "$CACHE/bin"
 
 # The sorried Challenge is deliberately not a default target (the default
