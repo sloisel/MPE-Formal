@@ -33,18 +33,21 @@ clone_build () { # $1 = repo/binary name, $2 = tag
 clone_build comparator  "$COMPARATOR_TAG"
 clone_build lean4export "$LEAN4EXPORT_TAG"
 
-# landrun, comparator's sandbox for child processes, is Linux-only (Landlock).
-# On macOS fall back to the passthrough (see its header for why that is sound
-# here).
-if [ "$(uname)" = "Linux" ]; then
-  if ! command -v landrun >/dev/null && [ ! -x "$CACHE/bin/landrun" ]; then
-    GOBIN="$CACHE/bin" go install github.com/zouuup/landrun/cmd/landrun@main
-  fi
-  LANDRUN="$(command -v landrun || true)"
-  LANDRUN="${LANDRUN:-$CACHE/bin/landrun}"
-else
-  LANDRUN="$(pwd)/scripts/landrun-passthrough"
-fi
+# Comparator wraps every child process in landrun, its Landlock sandbox.  We
+# substitute the passthrough (scripts/landrun-passthrough) on every platform,
+# for two reasons.  First, the sandbox exists to protect a checker who must
+# *build* an adversarial Solution; here the Solution is this repository's own
+# code and is already built by the preceding CI step, so the sandboxed builds
+# are replays of trusted artifacts (comparator's README makes the same point
+# about pre-built .lake directories).  Second, this comparator release
+# (v4.32.0) passes lean4export a literal "--" separating the module from the
+# declaration names, and landrun's flag parser (urfave/cli v3) consumes that
+# "--" as its own terminator, so under the real landrun lean4export receives
+# the declarations as module names and aborts: the sandboxed path is broken
+# at this version pair regardless.  The Palomar registry runs its own
+# comparator under its own sandbox at submission; this script mirrors the
+# mathematical checks, not the sandboxing.
+LANDRUN="$(pwd)/scripts/landrun-passthrough"
 
 COMPARATOR_LANDRUN="$LANDRUN" \
 COMPARATOR_LEAN4EXPORT="$CACHE/lean4export/.lake/build/bin/lean4export" \
