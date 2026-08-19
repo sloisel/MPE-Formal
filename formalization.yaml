@@ -4,6 +4,21 @@ version: "v0.4"
 
 project:
   name: "Local convergence of MPE and RRE for nonlinear fixed-point iterations"
+  description: >-
+    Machine-checked proofs of three probabilistic convergence theorems for
+    restarted Minimal Polynomial Extrapolation (MPE) applied to nonlinear
+    fixed-point iterations.  Dithered restarts converge with any order theta
+    in (1,2) from every starting point -- the breakdown set included -- with
+    an explicit failure-probability exponent over the dither.  Under simple
+    spectrum, a quadratic dither schedule achieves order 2 with failure
+    probability linear in the initial radius up to a logarithmic factor, and
+    MPE coincides with Reduced Rank Extrapolation at every cycle.  With no
+    dither at all, the restarted iteration from a single uniformly random
+    starting point squares the error at every cycle with high probability,
+    under two checkable hypotheses on the Jacobian and the quadratic Taylor
+    coefficients.  The registered statements are self-contained over mathlib:
+    every object of the construction is introduced by an explicit defining
+    equation among the hypotheses.
   authors: ["Sébastien Loisel"]
   responsible_maintainers: ["Sébastien Loisel"]
   license: "MIT"
