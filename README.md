@@ -24,6 +24,18 @@ tree — even in a file the three theorems do not reach — fails the build as a
 turned error.  There is one workflow and it is synchronous: a green badge means the
 build, the axiom audit and the warning check all passed for that commit.
 
+The repository also carries the [Palomar](https://palomar-registry.org/) layout:
+`Challenge.lean` states the three theorems with `sorry` bodies and imports only
+mathlib — the statement of record — `Solution.lean` proves them by importing the
+development, and `comparator.json` names them.  The workflow's second step runs
+[Comparator](https://github.com/leanprover/comparator) on every push: it rebuilds both
+modules, checks that the Solution proves exactly the Challenge's statements, re-runs
+the Lean kernel on the exported proofs, and enforces the three-axiom allowlist — the
+registry's mechanical check (a), mirrored locally.  The registry's other check,
+whether the informal accounts in `formalization.yaml` match the formal statements, is
+a judgment call and deliberately not in CI; the author reviews it before each
+submission.
+
 Some source files carry docstrings referring to `../../paper.tex`, `../../appendix.tex`
 and similar.  Those are the paper and its working notes, which live in a separate
 repository; the references are historical pointers and nothing here depends on them.
@@ -61,6 +73,7 @@ If `.lake` is ever deleted:  `lake resolve-deps` restores it in seconds.
 
     lake env lean Formal/Schedule.lean     # must produce no output
     #print axioms <theorem name>           # must not mention sorryAx
+    bash scripts/comparator.sh             # the Palomar check: statements + axioms + kernel replay
 
 `propext`, `Classical.choice`, `Quot.sound` are Lean's standard foundations and are
 expected.  Anything else — especially `sorryAx` — means the proof has a hole.

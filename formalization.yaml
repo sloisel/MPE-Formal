@@ -1,0 +1,154 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+
+version: "v0.4"
+
+project:
+  name: "Local convergence of MPE and RRE for nonlinear fixed-point iterations"
+  authors: ["Sébastien Loisel"]
+  responsible_maintainers: ["Sébastien Loisel"]
+  license: "MIT"
+
+# What was formalized: the three probabilistic theorems of the author's own
+# manuscript.  The results are new there; this formalization accompanies the
+# manuscript rather than reproving literature.  The manuscript is under journal
+# review and has no public identifier yet; this file will be updated with one
+# when it exists.
+sources:
+  - title: "On the local convergence of minimal polynomial and reduced rank extrapolation for nonlinear fixed-point iterations"
+    authors: ["Sébastien Loisel"]
+    id: ""
+    type: "article"
+    location: "Theorems 4.7, 4.9 and 5.5"
+    relationship: "formalizes"
+    author_endorsement: "participated"
+    note: >-
+      Manuscript by the same author, submitted for publication in July 2026;
+      no public identifier yet.  The theorem numbering used throughout this
+      file refers to the submitted version.
+
+related_formalizations: []
+
+classification:
+  arxiv: [math.NA]
+  msc2020: ["65B05", "65F10", "65H10", "41A17", "60D05"]
+
+status:
+  scope: >-
+    All three main theorems of the manuscript, in full generality, for ambient
+    dimension n >= 2: dithered restarted MPE converges with order theta in
+    (1,2) from every starting point with high probability over the dither
+    (Theorem 4.7, at the standing window k = deg m_A, A possibly derogatory);
+    with a quadratic schedule and simple spectrum the failure probability is
+    linear in delta up to a log factor and MPE coincides with RRE at every
+    cycle (Theorem 4.9); and the undithered iteration with random starting
+    point squares the error at every cycle with high probability under the
+    manuscript's Hypotheses 5.1-5.2 (Theorem 5.5).
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "MPE.mpe_dithered"
+      file: "Formal/Statement.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "MPE.mpe_quadratic"
+      file: "Formal/Statement.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "MPE.mpe_undithered"
+      file: "Formal/Statement.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["claude-opus-5", "claude-opus-4-x (earlier sessions)"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Interactive Claude Code sessions on the author's machine; no
+        orchestration beyond the stock harness.  The agent wrote essentially
+        all of the Lean source in this repository — choosing the Lean
+        formulations, finding and repairing the proofs, and designing the
+        build-time checks — under the direction and review of the author.
+      cost:
+        wall_time: "interactive sessions over roughly two weeks (July 2026)"
+        spend_usd: "subscription-based usage"
+        hardware: "API-only"
+      prompting_notes: >-
+        The author supplied the manuscript and its proofs, set the targets
+        (which theorems, which hypotheses packaging), made the mathematical
+        decisions, and reviewed the statements; the agent worked from the
+        manuscript's proofs rather than autoformalizing blindly.
+    - method: "manual"
+      models: []
+      framework: ""
+      tool_setup: >-
+        Author direction and review throughout: choice of results, approval of
+        every statement's phrasing, and audit of the statements against the
+        manuscript.
+  spend_usd: "subscription-based usage"
+  notes: >-
+    The corresponding disclosure in the manuscript states that Claude Code was
+    used to discuss the problem and to formalize the three theorems.
+
+fidelity:
+  divergences: >-
+    (1) Noise model: every random variable is uniform on a cube rather than a
+    ball.  The dither at cycle m is delta_m times a variable uniform on
+    [-1,1]^n (clamped coordinatewise; the clamp is almost surely the identity
+    under the product measure), and the starting point of Theorem 5.5 is rho
+    times a variable uniform on [-1,1]^n, where the manuscript draws both from
+    balls.  This changes constants only; every exponent is as in the
+    manuscript.  (2) Window convention in Theorem 4.7: the registered
+    statement (MPE.mpe_dithered) is proved at the standing window k = deg m_A
+    in the Gram form for every k, with failure exponent (2-theta)/(2k); the
+    manuscript's convention switches at the full window k = n to the
+    determinant form, giving the sharper exponent (2-theta)/n there.  The
+    sharper full-window variant is also proved in this repository
+    (Smooth.mpe_dithered_C2_stmt, Formal/SevenFull.lean) but is not among the
+    registered statements.  (3) The ambient dimension is n = M + 2, so the
+    statements cover n >= 2 only; in dimension 1 restarted MPE is Steffensen's
+    method and the phenomenon being controlled does not occur.  (4) The
+    restarted map is used in its cleared form S = Ntilde/sigmatilde
+    throughout; Theorems 4.9 and 5.5 certify in addition that the
+    least-squares system is nonsingular at every cycle (det U /= 0 is part of
+    the certified event), which is the manuscript's statement that MPE proper
+    is defined and agrees with RRE.
+
+review:
+  status: "self-assessed"
+  reviewers: ["Sébastien Loisel"]
+  notes: >-
+    The author directed the development and audited the three registered
+    statements against the manuscript, hypothesis by hypothesis.  The
+    manuscript itself is under journal peer review; that review concerns the
+    informal proofs and does not certify this repository.
+
+alignment:
+  namespace: "MPE"
+  statements:
+    - source: "Theorem 4.7 (dithered restarts, order theta)"
+      lean: "MPE.mpe_dithered"
+      module: "Formal/Statement.lean"
+      status: "proved"
+      note: "General window k = deg m_A, Gram form; see fidelity note (2)."
+    - source: "Theorem 4.9 (quadratic order under simple spectrum)"
+      lean: "MPE.mpe_quadratic"
+      module: "Formal/Statement.lean"
+      status: "proved"
+      note: "Failure event includes det U = 0, so MPE = RRE at every cycle is certified."
+    - source: "Theorem 5.5 (undithered algorithm, random start)"
+      lean: "MPE.mpe_undithered"
+      module: "Formal/Statement.lean"
+      status: "proved"
+      note: "Hypotheses 5.1 and 5.2 are the parameters hA2 and hA3."
+
+acknowledgements: >-
+  Built on mathlib (Apache 2.0), pinned by commit in lake-manifest.json.

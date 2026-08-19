@@ -45,6 +45,24 @@ jobs:
           use-mathlib-cache: true
           build-args: "--wfail"
 
+      # Palomar check (a), mirrored here so every push gets the registry's
+      # mechanical verdict synchronously: Comparator (leanprover/comparator)
+      # certifies that Solution proves exactly the statements of Challenge
+      # from propext, Classical.choice and Quot.sound alone, re-running the
+      # Lean kernel on the exported proofs.  The registry's check (b) --
+      # whether formalization.yaml's informal accounts match the formal
+      # statements -- is a judgment call (the registry runs an LLM; here the
+      # author reviews it before each submission) and is deliberately not in
+      # CI, which stays deterministic.
+      - name: Cache the Comparator toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mpe-comparator
+          key: comparator-v4.32.0-lean4export-v4.32.2-${{ hashFiles('lean-toolchain') }}
+
+      - name: Palomar check (a) — Comparator
+        run: bash scripts/comparator.sh
+
       # Deliberately not run here: `leanchecker`, which replays the compiled
       # environment through the kernel.  It guards against declarations reaching
       # the environment without full kernel checking — the `unsafe`,

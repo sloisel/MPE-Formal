@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Local-development stand-in for landrun, comparator's Linux-only Landlock
+# sandbox: skips the sandbox flags and executes the wrapped command directly.
+# This removes the sandbox, which is acceptable ONLY because the Solution being
+# checked is this repository's own code.  CI runs the real landrun.
+args=("$@")
+i=0
+while [ $i -lt ${#args[@]} ]; do
+  case "${args[$i]}" in
+    --ro|--rw|--rwx|--rox|--env) i=$((i+2));;
+    --best-effort|-ldd|-add-exec) i=$((i+1));;
+    *) break;;
+  esac
+done
+exec "${args[@]:$i}"
