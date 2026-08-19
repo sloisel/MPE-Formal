@@ -24,7 +24,9 @@ sources:
     note: >-
       Manuscript by the same author, submitted for publication in July 2026;
       no public identifier yet.  The theorem numbering used throughout this
-      file refers to the submitted version.
+      file refers to the submitted version.  Because the manuscript is not
+      yet publicly readable, the accounts under status.main_results below are
+      written to be understood without it.
 
 related_formalizations: []
 
@@ -33,34 +35,113 @@ classification:
   msc2020: ["65B05", "65F10", "65H10", "41A17", "60D05"]
 
 status:
+  # The manuscript is not yet publicly available, so the accounts below are
+  # written to stand alone: together with the docstrings of Challenge.lean
+  # they are the operative informal statements of what is claimed.
   scope: >-
-    All three main theorems of the manuscript, in full generality, for ambient
-    dimension n >= 2: dithered restarted MPE converges with order theta in
-    (1,2) from every starting point with high probability over the dither
-    (Theorem 4.7, at the standing window k = deg m_A, A possibly derogatory);
-    with a quadratic schedule and simple spectrum the failure probability is
-    linear in delta up to a log factor and MPE coincides with RRE at every
-    cycle (Theorem 4.9); and the undithered iteration with random starting
-    point squares the error at every cycle with high probability under the
-    manuscript's Hypotheses 5.1-5.2 (Theorem 5.5).
+    All three main theorems of the manuscript, for ambient dimension n >= 2
+    (the first is registered at the general-window Gram convention; see
+    fidelity note (2)).  The setting: a fixed-point iteration x_{j+1} = f(x_j)
+    in R^n, with f smooth near a fixed point placed at 0 (C^2 for the two
+    dithered theorems, C^3 for the undithered one) and Borel measurable
+    globally -- a hypothesis satisfied by any continuous iteration, needed
+    because the random process is defined through the global map -- with
+    Jacobian A = Df(0), and A - I invertible.  Minimal Polynomial Extrapolation (MPE) accelerates the
+    iteration: from a window of k+2 consecutive iterates it fits a monic
+    degree-k polynomial to the successive differences by least squares and
+    returns the weighted average s = (sum_j c_j x_j) / (sum_j c_j) of the
+    window, which for affine f is the fixed point itself.  Restarted MPE
+    computes s, restarts the iteration from it, and repeats; the one-cycle map
+    is used throughout in its cleared form S = Ntilde / sigmatilde, whose
+    denominator sigmatilde is a polynomial in the window entries obtained by
+    clearing the least-squares solve.  Restarted MPE can break down: for some
+    nonlinear f, sigmatilde vanishes at points arbitrarily close to an
+    attracting fixed point, and one cycle started near those points throws the
+    iterate arbitrarily far away, so no neighborhood of the fixed point exists
+    on which the method is even bounded.  The three theorems say,
+    quantitatively, that randomization defeats this.  Dithering -- a small
+    random perturbation before each cycle -- yields superlinear convergence
+    with high probability from every starting point, the breakdown set
+    included (first and second theorems).  Randomizing the starting point
+    alone, with no dither, does the same under extra hypotheses on f, the
+    probability now taken over that single draw (third theorem).  Each result
+    gives an explicit failure-probability exponent.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
   main_results:
     - declaration: "MPE.mpe_dithered"
       file: "Formal/Statement.lean"
+      account: >-
+        The manuscript's Theorem 4.7 (dithered restarts).  The iteration f
+        is C^2 near the fixed point and globally Borel measurable.  Fix an
+        order theta in (1,2) and the radius schedule delta_m =
+        delta^(theta^m).
+        Each cycle perturbs the current point by delta_m times a uniform draw
+        from the cube [-1,1]^n before extrapolating; the window is
+        k = deg(minimal polynomial of A) -- A may be derogatory -- and the
+        least-squares system is solved in Gram (normal-equations) form.
+        Conclusion: there are dstar, Cst > 0, depending only on f (with its
+        smoothness radius) and theta,
+        such that for every delta <= dstar and EVERY starting point x0 with
+        ||x0|| <= delta -- it may be chosen adversarially, in particular on
+        the breakdown set -- with probability at least
+        1 - Cst * delta^((2-theta)/(2k)) over the dither, every cycle is
+        defined (sigmatilde /= 0 at every dithered point) and
+        ||x_m|| <= delta_m for every m: the error decays doubly
+        exponentially, with order of convergence theta.  (On the window
+        convention and the sharper full-window exponent, see fidelity note
+        (2).)
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
       literature_dependencies: []
     - declaration: "MPE.mpe_quadratic"
       file: "Formal/Statement.lean"
+      account: >-
+        The manuscript's Theorem 4.9 (quadratic order under simple spectrum).
+        The same dithered iteration, now assuming the characteristic
+        polynomial of A squarefree (n distinct eigenvalues) with the full
+        window k = n, the system solved by Cramer/adjugate.  The schedule is
+        genuinely quadratic: delta_0 = delta, delta_{m+1} = K * delta_m^2,
+        with K >= 1 determined by f (and its smoothness radius) alone.  Conclusion: for every
+        delta <= dstar and every x0 with ||x0|| <= delta, with probability at
+        least 1 - Cst * delta * (1 + log+(1/delta))^(n-1) over the dither
+        (log+ = max(0, log)), every cycle is defined in the cleared form, the
+        least-squares matrix U is nonsingular at every dithered point -- by
+        the manuscript's identification (fidelity note (4)), MPE proper is
+        then defined there and coincides with Reduced Rank Extrapolation --
+        and
+        ||x_m|| <= delta_m for every m: order 2, with failure probability
+        linear in delta up to the logarithmic factor.
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
       literature_dependencies: []
     - declaration: "MPE.mpe_undithered"
       file: "Formal/Statement.lean"
+      account: >-
+        The manuscript's Theorem 5.5 (the undithered algorithm).  No dither:
+        the orbit of the cleared-form map S is deterministic, and the only
+        randomness is the starting point x0 = rho * b with b uniform on the
+        cube [-1,1]^n.  Here f is C^3 near the fixed point, globally Borel
+        measurable, and A is nonderogatory with the full window k = n.  Two hypotheses on an explicit pair of polynomials
+        built from A and the quadratic Taylor coefficients of f -- the
+        degeneracy form Q, whose zero directions are where MPE degenerates,
+        and the leading form G of the extrapolation numerator, both given by
+        defining equations among the theorem's hypotheses: (5.1) comparable
+        vanishing, c0*|Q(v)| <= ||G(v)|| <= C0*|Q(v)| for unit v, and (5.2)
+        the degeneracy at worst takes the power beta,
+        |Q(G(v)/||G(v)||)| >= c3*|Q(v)|^beta for unit v off the degenerate
+        set, for some beta in [0,2].  Conclusion: there are Cst, rho0 > 0,
+        with 4*C0*rho0 <= 1/2 -- which makes the squaring bound below a
+        contraction -- such that for every rho <= rho0, with probability at
+        least
+        1 - Cst * rho^(1/(n(beta+1))) in b, every cycle is defined
+        (sigmatilde /= 0 and det U /= 0), each cycle squares the error
+        (||x_{k+1}|| <= 4*C0*||x_k||^2), and
+        ||x_k|| <= (4*C0*||x0||)^(2^k) / (4*C0): doubly exponential decay
+        from a single random draw.
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
@@ -112,7 +193,7 @@ fidelity:
     manuscript's convention switches at the full window k = n to the
     determinant form, giving the sharper exponent (2-theta)/n there.  The
     sharper full-window variant is also proved in this repository
-    (Smooth.mpe_dithered_C2_stmt, Formal/SevenFull.lean) but is not among the
+    (MPE.mpe_dithered_C2_stmt, Formal/SevenFull.lean) but is not among the
     registered statements.  (3) The ambient dimension is n = M + 2, so the
     statements cover n >= 2 only; in dimension 1 restarted MPE is Steffensen's
     method and the phenomenon being controlled does not occur.  (4) The
@@ -120,7 +201,13 @@ fidelity:
     throughout; Theorems 4.9 and 5.5 certify in addition that the
     least-squares system is nonsingular at every cycle (det U /= 0 is part of
     the certified event), which is the manuscript's statement that MPE proper
-    is defined and agrees with RRE.
+    is defined and agrees with RRE.  (5) Norms: every ||.|| in the statements
+    is the sup norm on R^n (mathlib's norm on Fin n -> R), where the
+    manuscript uses the Euclidean norm; as with the cube-for-ball
+    substitution in (1), this changes constants only.  (6) Lean totalizes
+    division ((sigmatilde)^{-1} = 0 when sigmatilde = 0), so the process is
+    everywhere defined as a function; the certified events include
+    sigmatilde /= 0 at every cycle, so the convention never matters on them.
 
 review:
   status: "self-assessed"
@@ -143,7 +230,10 @@ alignment:
       lean: "MPE.mpe_quadratic"
       module: "Formal/Statement.lean"
       status: "proved"
-      note: "Failure event includes det U = 0, so MPE = RRE at every cycle is certified."
+      note: >-
+        The failure event includes det U = 0; that det U /= 0 makes MPE
+        proper defined and equal to RRE is the manuscript's identification
+        (fidelity note (4)).
     - source: "Theorem 5.5 (undithered algorithm, random start)"
       lean: "MPE.mpe_undithered"
       module: "Formal/Statement.lean"
