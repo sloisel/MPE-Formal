@@ -26,26 +26,83 @@ project:
   license: "MIT"
 
 # What was formalized: the three probabilistic theorems of the author's own
-# manuscript.  The manuscript is under journal review and has no public
-# identifier yet; this file will be updated with one when it exists.
-#
-# The manuscript's introduction carries the full literature account; the
-# background entries below record the principal prior work so that this file
-# stands alone.  In brief: the published local convergence theorems for
-# restarted MPE and RRE (Jbilou-Sadok 1991; Sidi 2020) are conditional -- they
-# assume nondegeneracy of the iterates along the whole trajectory -- and the
-# necessity of such hypotheses traces back to the gap disclosed by Smith, Ford
-# and Sidi (1987).  The manuscript also shows the hypotheses cannot simply be
-# dropped: it exhibits an explicit polynomial map on which restarted MPE is
-# unbounded on every neighborhood of an attracting fixed point (motivation
-# here, not a registered claim).  What the registered theorems add, following
-# the manuscript: local convergence guarantees for restarted MPE that assume
-# nothing about the iterates -- dithered restarts under C^2 smoothness alone
-# (mpe_dithered, mpe_quadratic), and an undithered iteration from a random
-# starting point under checkable hypotheses on f's Taylor coefficients
-# (mpe_undithered) -- with explicit failure probabilities in each case.  We
-# are not aware of prior probabilistic convergence guarantees for restarted
-# MPE or RRE.
+# manuscript, which is under journal review and has no public identifier yet;
+# this file will be updated with one when it exists.  The self-contained
+# mathematical context and the relation to prior work are in
+# literature_context below; the sources list is the bibliography.
+
+literature_context: >-
+  Minimal Polynomial Extrapolation was introduced by Cabay and Jackson (1976);
+  with Reduced Rank Extrapolation it is one of the standard polynomial-type
+  acceleration methods for vector fixed-point iterations, used in restarted
+  ("cycled") form: extrapolate, restart the iteration from the extrapolated
+  point, repeat (Sidi's 2017 monograph; Saad's 2025 survey).
+
+
+  For nonlinear iterations the local convergence theory of the restarted
+  methods has a long-standing difficulty.  The early quadratic-convergence
+  arguments were examined by Smith, Ford and Sidi in their 1987 survey, who
+  found in all of them a gap they could not close, and accordingly printed
+  quadratic convergence as ""Theorem" 5" -- in quotation marks.  The gap is
+  the boundedness of the per-cycle coefficients: each cycle satisfies
+  ||x_{m+1} - x*|| <= alpha_m ||x_m - x*||^2, but nothing bounds the alpha_m
+  uniformly.  The theorems that exist resolve this conditionally: Jbilou and
+  Sadok (1991) proved quadratic convergence for restarted MPE/RRE assuming a
+  uniform nondegeneracy of the iterates along the whole trajectory (a lower
+  bound on the sine of the angle between consecutive difference vectors),
+  and showed by example that the angle can genuinely degenerate; Sidi's 2020
+  study of RRE on nonlinear systems is in the same framework, and his 2012
+  review records that the MPE denominator can vanish ("we cannot guarantee
+  that the sum of the c_i is nonzero always").  These are hypotheses on the
+  infinitely many iterates the algorithm has yet to produce, and are hard to
+  verify in practice.  The neighboring literature on Anderson acceleration is
+  in the same situation, assuming uniformly bounded mixing coefficients
+  (Walker-Ni 2011; Toth-Kelley 2015; Evans-Pollock-Rebholz-Xiao 2020).  A
+  deterministic repair exists -- regularized nonlinear acceleration
+  (Scieur-d'Aspremont-Bach 2020) damps the least-squares weights -- but it
+  recovers linear convergence on some convex objectives and does not
+  decorrelate consecutive cycles.
+
+
+  The hypotheses on the iterates are not an artifact of the proofs: the
+  manuscript exhibits an explicit two-dimensional polynomial map, contractive
+  at its fixed point, on which one restarted-MPE cycle is unbounded on every
+  neighborhood of the fixed point -- the extrapolation denominator vanishes
+  on a curve through the fixed point.  (That counterexample is motivation
+  here, not a registered claim.)  The registered theorems are the
+  constructive half: convergence guarantees for restarted MPE that assume
+  nothing about the iterates.  mpe_dithered: perturbing each restart by a
+  small random vector on a prescribed, problem-independent radius schedule
+  keeps the error below a doubly exponentially shrinking envelope from every
+  starting point -- the breakdown set included -- with explicit failure
+  probability, under C^2 smoothness and 1 not in spec(Df(0)) alone.
+  mpe_quadratic: under simple spectrum, the same with a quadratically
+  shrinking schedule and failure probability linear in the initial radius up
+  to a logarithmic factor, with MPE and RRE provably agreeing at every cycle
+  (the coincidence of the two methods at full rank is Sidi 2017,
+  "MPE and RRE are related").  mpe_undithered: with no dither and only the
+  starting point random, the same conclusion under two checkable hypotheses
+  on the quadratic Taylor coefficients of f, rather than on the iterates.
+
+
+  Randomizing to escape a thin degenerate set is a classical device: a random
+  start makes the largest eigenvalue computable where deterministic starts
+  can fail (Kuczynski-Wozniakowski 1992), random perturbations let gradient
+  descent escape saddle points (Jin-Netrapalli-Ge-Kakade-Jordan 2021),
+  restarting is a cure for serious breakdown in the look-ahead Lanczos
+  process (Parlett-Taylor-Liu 1985), and perturbing degenerate data is the
+  standard remedy for cycling in linear programming (Charnes 1952) and for
+  degeneracies in computational geometry (Edelsbrunner-Mucke 1990).  What
+  makes the device quantitative here is that the failure set is the zero set
+  of an explicit polynomial built from Df(0) alone, so a Remez-type
+  inequality of Brudnyi and Ganzburg (1973) bounds the measure of its
+  neighborhoods; by contrast, Rayleigh quotient iteration has open failure
+  sets for nonsymmetric matrices, and no perturbation of any size can repair
+  it (Batterson-Smillie 1989, 1990).  We are not aware of prior probabilistic
+  convergence guarantees for restarted MPE or RRE; the conditional theorems
+  cited above are, to our knowledge, the state of the art recorded in the
+  current surveys.
+
 sources:
   - title: "On the local convergence of minimal polynomial and reduced rank extrapolation for nonlinear fixed-point iterations"
     authors: ["Sébastien Loisel"]
@@ -62,17 +119,25 @@ sources:
       written to be understood without it.  The background entries below
       mirror the manuscript's own literature account.
 
+  - title: "A polynomial extrapolation method for finding limits and antilimits of vector sequences"
+    authors: ["S. Cabay", "L. W. Jackson"]
+    id: "SIAM J. Numer. Anal. 13 (1976) 734-752"
+    type: "article"
+    relationship: "background"
+    note: "Where Minimal Polynomial Extrapolation was introduced."
+
   - title: "Extrapolation methods for vector sequences"
     authors: ["D. A. Smith", "W. F. Ford", "A. Sidi"]
     id: "SIAM Rev. 29 (1987) 199-233"
     type: "article"
     relationship: "background"
     note: >-
-      Examined the early quadratic-convergence arguments for the cycled
-      vector-extrapolation methods, disclosed a gap they could not close, and
-      accordingly stated quadratic convergence as ""Theorem" 5", in quotation
-      marks.  The question of what holds without extra hypotheses is what the
-      manuscript takes up.
+      The survey that examined the early quadratic-convergence arguments for
+      the cycled methods, disclosed a gap none of them closes (the per-cycle
+      coefficients are never shown bounded), and accordingly stated quadratic
+      convergence as ""Theorem" 5", in quotation marks.  The question of what
+      holds without extra hypotheses is what the registered theorems answer
+      probabilistically.
 
   - title: "Some results about vector extrapolation methods and related fixed-point iterations"
     authors: ["K. Jbilou", "H. Sadok"]
@@ -97,6 +162,24 @@ sources:
       the sum of the c_i is nonzero always" -- that is, breakdown cannot be
       ruled out.
 
+  - title: "Minimal polynomial and reduced rank extrapolation methods are related"
+    authors: ["A. Sidi"]
+    id: "Adv. Comput. Math. 43 (2017) 151-170"
+    type: "article"
+    relationship: "background"
+    note: >-
+      MPE and RRE coincide exactly at the first index where the difference
+      matrix loses full rank.  This is the fact behind the MPE = RRE agreement
+      that mpe_quadratic certifies inside its event (det U /= 0 at every
+      cycle).
+
+  - title: "Vector Extrapolation Methods with Applications"
+    authors: ["A. Sidi"]
+    id: "SIAM, Philadelphia, 2017"
+    type: "book"
+    relationship: "background"
+    note: "The standard monograph, including the restarted (cycling) mode of use."
+
   - title: "A convergence study for reduced rank extrapolation on nonlinear systems"
     authors: ["A. Sidi"]
     id: "Numer. Algorithms 84 (2020) 957-982"
@@ -105,6 +188,37 @@ sources:
     note: >-
       The corresponding conditional convergence study for RRE, in the same
       iterates-hypothesis framework.
+
+  - title: "Acceleration methods for fixed-point iterations"
+    authors: ["Y. Saad"]
+    id: "Acta Numer. 34 (2025) 805-890"
+    type: "article"
+    relationship: "background"
+    note: "The recent survey of the field."
+
+  - title: "Anderson acceleration for fixed-point iterations"
+    authors: ["H. F. Walker", "P. Ni"]
+    id: "SIAM J. Numer. Anal. 49 (2011) 1715-1735"
+    type: "article"
+    relationship: "background"
+    note: >-
+      The neighboring Anderson-acceleration theory; with the two entries
+      below, its local convergence results likewise assume uniformly bounded
+      coefficients along the iteration.
+
+  - title: "Convergence analysis for Anderson acceleration"
+    authors: ["A. Toth", "C. T. Kelley"]
+    id: "SIAM J. Numer. Anal. 53 (2015) 805-819"
+    type: "article"
+    relationship: "background"
+    note: "Local convergence for Anderson acceleration under bounded mixing coefficients."
+
+  - title: "A proof that Anderson acceleration improves the convergence rate in linearly converging fixed-point methods (but not in those converging quadratically)"
+    authors: ["C. Evans", "S. Pollock", "L. Rebholz", "M. Xiao"]
+    id: "SIAM J. Numer. Anal. 58 (2020) 788-810"
+    type: "article"
+    relationship: "background"
+    note: "The sharpened Anderson theory, in the same conditional framework."
 
   - title: "Regularized nonlinear acceleration"
     authors: ["D. Scieur", "A. d'Aspremont", "F. Bach"]
@@ -117,14 +231,73 @@ sources:
       The registered results randomize instead and retain superlinear
       schedule bounds.
 
-  - title: "Acceleration methods for fixed-point iterations"
-    authors: ["Y. Saad"]
-    id: "Acta Numer. 34 (2025) 805-890"
+  - title: "Estimating the largest eigenvalue by the power and Lanczos algorithms with a random start"
+    authors: ["J. Kuczynski", "H. Wozniakowski"]
+    id: "SIAM J. Matrix Anal. Appl. 13 (1992) 1094-1122"
     type: "article"
     relationship: "background"
     note: >-
-      The recent survey of the field, cited by the manuscript alongside the
-      conditional theorems above for the state of the art.
+      The classical precedent for the device used here: a random start
+      succeeds with high probability where deterministic starts can fail.
+
+  - title: "On nonconvex optimization for machine learning: gradients, stochasticity, and saddle points"
+    authors: ["C. Jin", "P. Netrapalli", "R. Ge", "S. M. Kakade", "M. I. Jordan"]
+    id: "J. ACM 68 (2021) 1-29"
+    type: "article"
+    relationship: "background"
+    note: "Random perturbations escaping thin bad sets, in optimization."
+
+  - title: "A look-ahead Lanczos algorithm for unsymmetric matrices"
+    authors: ["B. N. Parlett", "D. R. Taylor", "Z. A. Liu"]
+    id: "Math. Comp. 44 (1985) 105-124"
+    type: "article"
+    relationship: "background"
+    note: >-
+      Serious breakdown in the nonsymmetric Lanczos process, with restarting
+      among the remedies -- the Krylov-space cousin of the breakdown
+      phenomenon controlled here.
+
+  - title: "Optimality and degeneracy in linear programming"
+    authors: ["A. Charnes"]
+    id: "Econometrica 20 (1952) 160-170"
+    type: "article"
+    relationship: "background"
+    note: "Perturbation as the standard remedy for cycling under degeneracy."
+
+  - title: "Simulation of simplicity: a technique to cope with degenerate cases in geometric algorithms"
+    authors: ["H. Edelsbrunner", "E. P. Mucke"]
+    id: "ACM Trans. Graph. 9 (1990) 66-104"
+    type: "article"
+    relationship: "background"
+    note: "Symbolic perturbation against degeneracies in computational geometry."
+
+  - title: "The dynamics of Rayleigh quotient iteration"
+    authors: ["S. Batterson", "J. Smillie"]
+    id: "SIAM J. Numer. Anal. 26 (1989) 624-636"
+    type: "article"
+    relationship: "background"
+    note: >-
+      With the companion paper below: Rayleigh quotient iteration fails on
+      OPEN sets of starting points for nonsymmetric matrices, so no
+      perturbation of any size repairs it.  The contrast case: what makes
+      randomization work for restarted MPE is that its failure set is thin.
+
+  - title: "Rayleigh quotient iteration for nonsymmetric matrices"
+    authors: ["S. Batterson", "J. Smillie"]
+    id: "Math. Comp. 55 (1990) 169-178"
+    type: "article"
+    relationship: "background"
+    note: "See the previous entry."
+
+  - title: "On an extremal problem for polynomials in n variables"
+    authors: ["Yu. A. Brudnyi", "M. I. Ganzburg"]
+    id: "Math. USSR Izv. 7 (1973) 345-356"
+    type: "article"
+    relationship: "background"
+    note: >-
+      The Remez-type inequality that makes the thinness of the degenerate set
+      quantitative: it bounds the measure of polynomial sublevel sets, and
+      through it the failure probabilities of the registered theorems.
 
 related_formalizations: []
 
