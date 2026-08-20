@@ -7,16 +7,18 @@ project:
   description: >-
     Machine-checked proofs of three probabilistic convergence theorems for
     restarted Minimal Polynomial Extrapolation (MPE) applied to nonlinear
-    fixed-point iterations.  Dithered restarts converge with any order theta
-    in (1,2) from every starting point -- the breakdown set included -- with
-    an explicit failure-probability exponent over the dither.  Under simple
-    spectrum, a quadratic dither schedule achieves order 2 with failure
-    probability linear in the initial radius up to a logarithmic factor, and
-    MPE coincides with Reduced Rank Extrapolation at every cycle.  With no
-    dither at all, the restarted iteration from a single uniformly random
-    starting point squares the error at every cycle with high probability,
-    under two checkable hypotheses on the Jacobian and the quadratic Taylor
-    coefficients.  The registered statements are self-contained over mathlib:
+    fixed-point iterations.  Dithered restarts keep the error below the
+    doubly exponential schedule delta^(theta^m), for any theta in (1,2), from
+    every starting point -- the breakdown set included -- with an explicit
+    failure-probability exponent over the dither; in the root sense the
+    convergence order is at least theta.  Under simple spectrum, the error
+    follows a quadratically shrinking dither schedule (root order at least 2)
+    with failure probability linear in the initial radius up to a logarithmic
+    factor, and MPE coincides with Reduced Rank Extrapolation at every cycle.
+    With no dither at all, the restarted iteration from a single uniformly
+    random starting point at worst squares the error at every cycle with high
+    probability, under two checkable hypotheses on the Jacobian and the
+    quadratic Taylor coefficients.  The registered statements are self-contained over mathlib:
     every object of the construction is introduced by an explicit defining
     equation among the hypotheses.
   authors: ["Sébastien Loisel"]
@@ -24,10 +26,26 @@ project:
   license: "MIT"
 
 # What was formalized: the three probabilistic theorems of the author's own
-# manuscript.  The results are new there; this formalization accompanies the
-# manuscript rather than reproving literature.  The manuscript is under journal
-# review and has no public identifier yet; this file will be updated with one
-# when it exists.
+# manuscript.  The manuscript is under journal review and has no public
+# identifier yet; this file will be updated with one when it exists.
+#
+# The manuscript's introduction carries the full literature account; the
+# background entries below record the principal prior work so that this file
+# stands alone.  In brief: the published local convergence theorems for
+# restarted MPE and RRE (Jbilou-Sadok 1991; Sidi 2020) are conditional -- they
+# assume nondegeneracy of the iterates along the whole trajectory -- and the
+# necessity of such hypotheses traces back to the gap disclosed by Smith, Ford
+# and Sidi (1987).  The manuscript also shows the hypotheses cannot simply be
+# dropped: it exhibits an explicit polynomial map on which restarted MPE is
+# unbounded on every neighborhood of an attracting fixed point (motivation
+# here, not a registered claim).  What the registered theorems add, following
+# the manuscript: local convergence guarantees for restarted MPE that assume
+# nothing about the iterates -- dithered restarts under C^2 smoothness alone
+# (mpe_dithered, mpe_quadratic), and an undithered iteration from a random
+# starting point under checkable hypotheses on f's Taylor coefficients
+# (mpe_undithered) -- with explicit failure probabilities in each case.  We
+# are not aware of prior probabilistic convergence guarantees for restarted
+# MPE or RRE.
 sources:
   - title: "On the local convergence of minimal polynomial and reduced rank extrapolation for nonlinear fixed-point iterations"
     authors: ["Sébastien Loisel"]
@@ -41,7 +59,72 @@ sources:
       no public identifier yet.  The theorem numbering used throughout this
       file refers to the submitted version.  Because the manuscript is not
       yet publicly readable, the accounts under status.main_results below are
-      written to be understood without it.
+      written to be understood without it.  The background entries below
+      mirror the manuscript's own literature account.
+
+  - title: "Extrapolation methods for vector sequences"
+    authors: ["D. A. Smith", "W. F. Ford", "A. Sidi"]
+    id: "SIAM Rev. 29 (1987) 199-233"
+    type: "article"
+    relationship: "background"
+    note: >-
+      Examined the early quadratic-convergence arguments for the cycled
+      vector-extrapolation methods, disclosed a gap they could not close, and
+      accordingly stated quadratic convergence as ""Theorem" 5", in quotation
+      marks.  The question of what holds without extra hypotheses is what the
+      manuscript takes up.
+
+  - title: "Some results about vector extrapolation methods and related fixed-point iterations"
+    authors: ["K. Jbilou", "H. Sadok"]
+    id: "J. Comput. Appl. Math. 36 (1991) 385-398"
+    type: "article"
+    relationship: "background"
+    note: >-
+      The principal prior local convergence theorem for restarted MPE/RRE:
+      quadratic convergence, conditional on a uniform nondegeneracy hypothesis
+      imposed on the iterates along the whole trajectory (a lower bound on the
+      sine of the angle between consecutive difference vectors), together with
+      an example showing the angle can degenerate.  The registered theorems
+      impose no hypothesis on the iterates.
+
+  - title: "Review of two vector extrapolation methods of polynomial type with applications to large-scale problems"
+    authors: ["A. Sidi"]
+    id: "J. Comput. Sci. 3 (2012) 92-101"
+    type: "article"
+    relationship: "background"
+    note: >-
+      Records that MPE's denominator can vanish -- "we cannot guarantee that
+      the sum of the c_i is nonzero always" -- that is, breakdown cannot be
+      ruled out.
+
+  - title: "A convergence study for reduced rank extrapolation on nonlinear systems"
+    authors: ["A. Sidi"]
+    id: "Numer. Algorithms 84 (2020) 957-982"
+    type: "article"
+    relationship: "background"
+    note: >-
+      The corresponding conditional convergence study for RRE, in the same
+      iterates-hypothesis framework.
+
+  - title: "Regularized nonlinear acceleration"
+    authors: ["D. Scieur", "A. d'Aspremont", "F. Bach"]
+    id: "Math. Program. 179 (2020) 47-83"
+    type: "article"
+    relationship: "background"
+    note: >-
+      The deterministic alternative: damping the least-squares weights, which
+      bounds them and recovers linear convergence on some convex objectives.
+      The registered results randomize instead and retain superlinear
+      schedule bounds.
+
+  - title: "Acceleration methods for fixed-point iterations"
+    authors: ["Y. Saad"]
+    id: "Acta Numer. 34 (2025) 805-890"
+    type: "article"
+    relationship: "background"
+    note: >-
+      The recent survey of the field, cited by the manuscript alongside the
+      conditional theorems above for the state of the art.
 
 related_formalizations: []
 
@@ -75,9 +158,9 @@ status:
     iterate arbitrarily far away, so no neighborhood of the fixed point exists
     on which the method is even bounded.  The three theorems say,
     quantitatively, that randomization defeats this.  Dithering -- a small
-    random perturbation before each cycle -- yields superlinear convergence
-    with high probability from every starting point, the breakdown set
-    included (first and second theorems).  Randomizing the starting point
+    random perturbation before each cycle -- keeps the error below a
+    superlinearly shrinking schedule with high probability from every
+    starting point, the breakdown set included (first and second theorems).  Randomizing the starting point
     alone, with no dither, does the same under extra hypotheses on f, the
     probability now taken over that single draw (third theorem).  Each result
     gives an explicit failure-probability exponent.
@@ -103,10 +186,13 @@ status:
         the breakdown set -- with probability at least
         1 - Cst * delta^((2-theta)/(2k)) over the dither, every cycle is
         defined (sigmatilde /= 0 at every dithered point) and
-        ||x_m|| <= delta_m for every m: the error decays doubly
-        exponentially, with order of convergence theta.  (On the window
-        convention and the sharper full-window exponent, see fidelity note
-        (2).)
+        ||x_m|| <= delta_m for every m.  The proved statement is exactly that
+        envelope: the error is bounded by a doubly exponentially shrinking
+        schedule, i.e. convergence of order at least theta in the root
+        (R-order) sense.  No relation between successive actual errors is
+        asserted; a trajectory may converge faster than the schedule.  (On
+        the window convention and the sharper full-window exponent, see
+        fidelity note (2).)
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
@@ -127,8 +213,10 @@ status:
         the manuscript's identification (fidelity note (4)), MPE proper is
         then defined there and coincides with Reduced Rank Extrapolation --
         and
-        ||x_m|| <= delta_m for every m: order 2, with failure probability
-        linear in delta up to the logarithmic factor.
+        ||x_m|| <= delta_m for every m: the error is bounded by the
+        quadratically shrinking schedule (order at least 2 in the same
+        root sense), with failure probability linear in delta up to the
+        logarithmic factor.
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"

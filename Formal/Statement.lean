@@ -99,8 +99,8 @@ theorem mpe_dithered
 
 /-- **The paper's Theorem 4.9** (quadratic order under simple spectrum).  Same iteration
 and dither as `mpe_dithered`, but `A` has `n` distinct eigenvalues (`hsq`), the window is
-full (`k = n`, adjugate form), and the schedule is `δ₀ = δ`, `δₖ₊₁ = K·δₖ²` — order
-exactly `2`.  With probability at least `1 - Cst·δ·(1 + log(1/δ))^(n-1)` over the dither:
+full (`k = n`, adjugate form), and the schedule is `δ₀ = δ`, `δₖ₊₁ = K·δₖ²` — the schedule
+itself shrinks quadratically.  With probability at least `1 - Cst·δ·(1 + log(1/δ))^(n-1)` over the dither:
 every cycle is defined in the cleared form (`σ̃ ≠ 0`), the least-squares system is
 nonsingular (`det U ≠ 0`, so MPE and RRE agree at every cycle), and `‖xₖ‖ ≤ δₖ` for
 all `k`. -/
